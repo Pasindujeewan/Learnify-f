@@ -1,5 +1,5 @@
-import { Home } from "./pages/Home";
 import { HeaderDesktop, HeaderMobile } from "./components/Header";
+import { Outlet } from "react-router-dom";
 
 function App() {
   return (
@@ -13,7 +13,9 @@ function App() {
           <HeaderMobile />
         </div>
 
-        <Home />
+        <main>
+          <Outlet />
+        </main>
       </div>
     </>
   );

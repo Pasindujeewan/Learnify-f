@@ -1,5 +1,5 @@
 import hero from "../../assets/hero.png";
-import { FaBook, FaRocket } from "react-icons/fa";
+import { FaBook, FaRocket, FaSearch } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export function HeroSection() {
@@ -39,21 +39,39 @@ export function HeroSection() {
             Get Started
           </motion.button>
         </div>
+        <div className="relative w-full mt-8">
+          {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Search courses..."
+            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 
+        bg-gray-100 text-gray-700 placeholder-gray-400
+        focus:outline-none focus:ring-2 focus:ring-blue-500 
+        focus:border-transparent transition-all duration-200"
+          />
+          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        </div>
 
         {/* Stats */}
         <div className="flex justify-center md:justify-start gap-6 md:gap-10 mt-8 flex-wrap">
-          <div>
-            <h1 className="text-lg md:text-xl font-semibold">2M+</h1>
+          <div className="text-center">
+            <h1 className="text-lg md:text-3xl font-semibold mb-1 tracking-wide text-orange-500">
+              2M+
+            </h1>
             <p className="text-xs md:text-sm">Active Students</p>
           </div>
 
-          <div>
-            <h1 className="text-lg md:text-xl font-semibold">500+</h1>
+          <div className="text-center">
+            <h1 className="text-lg md:text-3xl font-semibold mb-1 tracking-wide">
+              500+
+            </h1>
             <p className="text-xs md:text-sm">Expert Instructors</p>
           </div>
 
-          <div>
-            <h1 className="text-lg md:text-xl font-semibold">10K+</h1>
+          <div className="text-center">
+            <h1 className="text-lg md:text-3xl font-semibold mb-1 tracking-wide">
+              10K+
+            </h1>
             <p className="text-xs md:text-sm">Courses Available</p>
           </div>
         </div>
