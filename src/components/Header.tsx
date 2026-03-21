@@ -88,27 +88,27 @@ export function HeaderMobile() {
               transition={{ duration: 0.2 }}
               className="absolute right-0 top-17 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2 z-10 gap-y-2"
             >
-              <NavLink to="/">
+              <NavLink to="/" onClick={() => setIsMenuOpen(false)}>
                 <li className="px-4 py-2 active:bg-gray-200 cursor-pointer transition duration-200">
                   Home
                 </li>
               </NavLink>
-              <NavLink to="/courses">
+              <NavLink to="/courses" onClick={() => setIsMenuOpen(false)}>
                 <li className="px-4 py-2 active:bg-gray-200 cursor-pointer transition duration-200">
                   Courses
                 </li>
               </NavLink>
-              <NavLink to="/dashboard">
+              <NavLink to="/dashboard" onClick={() => setIsMenuOpen(false)}>
                 <li className="px-4 py-2 active:bg-gray-200 cursor-pointer transition duration-200">
                   Dashboard
                 </li>
               </NavLink>
-              <NavLink to="/profile">
+              <NavLink to="/profile" onClick={() => setIsMenuOpen(false)}>
                 <li className="px-4 py-2 active:bg-gray-200 cursor-pointer transition duration-200">
                   Profile
                 </li>
               </NavLink>
-              <NavLink to="/about">
+              <NavLink to="/about" onClick={() => setIsMenuOpen(false)}>
                 <li className="px-4 py-2 active:bg-gray-200 cursor-pointer transition duration-200">
                   About us
                 </li>
