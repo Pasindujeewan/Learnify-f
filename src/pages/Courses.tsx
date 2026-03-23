@@ -35,19 +35,17 @@ const filters = [
 ];
 
 export function Courses() {
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // for mobile filter toggle
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showSubFilters, setShowSubFilters] = useState<string[]>([
     "Level",
     "Category",
     "Language",
     "Duration",
     "Price",
-  ]); // to manage sub-filter visibility
-  const [activeFilter, setActiveFilter] = useState<string[]>([]); // to store selected filters
-  const [sortOption, setSortOption] = useState(""); // to store selected sort option
-  // to store filtered and sorted courses
+  ]);
+  const [activeFilter, setActiveFilter] = useState<string[]>([]);
+  const [sortOption, setSortOption] = useState("");
 
-  // sub-filter toggle handler
   function toggleSubFilters(filterName: string) {
     if (showSubFilters.includes(filterName)) {
       setShowSubFilters(showSubFilters.filter((f) => f !== filterName));
@@ -55,15 +53,16 @@ export function Courses() {
       setShowSubFilters([...showSubFilters, filterName]);
     }
   }
+
   const toggleFilter = (value: string) => {
     setActiveFilter((prev) =>
       prev.includes(value) ? prev.filter((f) => f !== value) : [...prev, value],
     );
   };
+
   const visibleCourses = useMemo(() => {
     let result = [...courses];
 
-    // filter
     if (activeFilter.length > 0) {
       result = result.filter(
         (c) =>
@@ -75,7 +74,6 @@ export function Courses() {
       );
     }
 
-    // sort
     if (sortOption === "Popular") {
       result.sort((a, b) => b.rating - a.rating);
     } else if (sortOption === "Newest") {
@@ -84,8 +82,9 @@ export function Courses() {
 
     return result;
   }, [courses, activeFilter, sortOption]);
+
   return (
-    <div className="flex mt-5 md:px-10 px-2 gap-2 ">
+    <div className="flex mt-5 md:px-10 px-2 gap-2">
       {/* filters toggle button */}
       <motion.div
         initial={{ x: 0 }}
@@ -95,16 +94,17 @@ export function Courses() {
       >
         {isFilterOpen ? (
           <FiChevronLeft
-            className="text-2xl cursor-pointer"
+            className="text-2xl cursor-pointer text-gray-600"
             onClick={() => setIsFilterOpen(false)}
           />
         ) : (
           <FiChevronRight
-            className="text-2xl cursor-pointer"
+            className="text-2xl cursor-pointer text-gray-600"
             onClick={() => setIsFilterOpen(true)}
           />
         )}
       </motion.div>
+
       {/* filter section */}
       <motion.div
         initial={{ x: window.innerWidth < 768 ? -260 : 0 }}
@@ -113,70 +113,78 @@ export function Courses() {
         }}
         transition={{ duration: 0.3 }}
         className="
-    bg-white rounded-2xl p-10
-    fixed md:static
-    top-0 left-0
-    h-full md:h-auto
-    w-64
-    z-20 md:w-90
-  "
+          bg-white rounded-2xl p-6
+          fixed md:static
+          top-0 left-0
+          h-full md:h-auto
+          w-64 md:w-72
+          z-20
+          shadow-sm border border-gray-100
+        "
       >
-        <h2 className="text-lg font-semibold mb-10">Filter Courses</h2>
-        <div className="flex flex-col gap-3 h-screen  overflow-y-auto">
+        <h2 className="text-base font-semibold text-gray-800 mb-6">
+          Filter Courses
+        </h2>
+        <div className="flex flex-col gap-2 h-screen overflow-y-auto">
           {filters.map((filter) => (
             <div key={filter.name}>
               <h5
-                className="text-lg text-gray-500 mb-2 flex items-center justify-between cursor-pointer px-5 py-2"
+                className="text-sm font-medium text-gray-600 mb-1 flex items-center justify-between cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={() => toggleSubFilters(filter.name)}
               >
                 {filter.name}
-                <span className="ml-2  ">
+                <span className="ml-2 text-gray-400">
                   {showSubFilters.includes(filter.name) ? (
-                    <FiChevronUp className="" />
+                    <FiChevronUp />
                   ) : (
                     <FiChevronDown />
                   )}
                 </span>
               </h5>
               {showSubFilters.includes(filter.name) && (
-                <div className="flex flex-col gap-7 pl-10">
+                <div className="flex flex-col gap-2 pl-4 pb-2">
                   {filter.options.map((option) => (
-                    <label key={option} className="flex items-center gap-2">
+                    <label
+                      key={option}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
                       <input
                         type="checkbox"
-                        className="form-checkbox h-5 w-5 text-blue-500 rounded"
+                        className="w-4 h-4 accent-green-500 rounded"
                         checked={activeFilter.includes(option)}
                         onChange={() => toggleFilter(option)}
                       />
-                      <span className="text-sm">{option}</span>
+                      <span className="text-sm text-gray-600">{option}</span>
                     </label>
                   ))}
                 </div>
               )}
+              <hr className="border-gray-100 my-1" />
             </div>
           ))}
         </div>
       </motion.div>
+
       {/* courses section */}
-      <div className="flex-3  bg-white rounded-2xl md:p-5 p-2">
-        <div className="flex  md:flex-row justify-evenly items-center gap-3 w-full ">
+      <div className="flex-3 bg-white rounded-2xl md:p-5 p-2 shadow-sm border border-gray-100">
+        <div className="flex md:flex-row justify-evenly items-center gap-3 w-full">
           {/* Search */}
           <div className="relative w-full flex-1">
             <input
               type="text"
               placeholder="Search courses..."
-              className=" pl-10 pr-3 md:w-[50%]  py-2.5 rounded-lg border border-gray-300
-          text-gray-700 text-sm14+
-          focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="pl-10 pr-3 md:w-[50%] py-2.5 rounded-lg border border-gray-200
+                text-gray-700 text-sm bg-gray-50
+                focus:outline-none focus:ring-2 focus:ring-green-400 focus:bg-white transition"
             />
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
           </div>
 
           {/* Sort */}
           <select
-            className="py-2.5 px-3 w-20 md:w-35 rounded-lg border border-gray-300
-        text-sm text-gray-700
-        focus:outline-none focus:ring-2 focus:ring-blue-500 transitio "
+            className="py-2.5 px-3 w-20 md:w-35 rounded-lg border border-gray-200
+              text-sm text-gray-700 bg-gray-50
+              focus:outline-none focus:ring-2 focus:ring-green-400 transition"
             onChange={(e) => setSortOption(e.target.value)}
           >
             <option value="">Sort</option>
@@ -186,7 +194,8 @@ export function Courses() {
           </select>
         </div>
 
-        <hr className="my-8 border-gray-500 dark:border-gray-500" />
+        <hr className="my-6 border-gray-100" />
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 items-center justify-center">
           {visibleCourses.map((course) => (
             <CourseCard key={course.id} course={course} />

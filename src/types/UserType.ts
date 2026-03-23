@@ -5,7 +5,19 @@ export type User = {
   name: string;
   email: string;
   password: string;
-  avatar: string;
+  avatar?: FileList; // URL to profile picture
+  role: "student" | "instructor";
+  bio?: string;
+  description?: string;
+  contact: Contact;
+};
+
+export type UserForm = {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  avatar?: string; // URL to profile picture
   role: "student" | "instructor";
   bio?: string;
   description?: string;

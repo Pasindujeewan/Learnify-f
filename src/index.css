@@ -20,3 +20,31 @@
 body {
   font-family: "Inter", sans-serif;
 }
+@layer components {
+  .input {
+    @apply w-full p-3 border border-gray-300 rounded-xl bg-gray-50
+    transition duration-200 mb-5;
+  }
+
+  .input:focus {
+    @apply outline-none border-blue-500 bg-white ring-2 ring-blue-300;
+  }
+
+  .input-error {
+    @apply border-red-500 ring-red-300;
+  }
+
+  .error-text {
+    @apply absolute -bottom-4 left-1 text-red-500 text-xs;
+  }
+
+  .btn {
+    @apply px-4 py-2 bg-blue-500 text-white rounded-xl
+    hover:bg-blue-600 transition duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-200 rounded-xl
+    hover:bg-gray-300 transition duration-200;
+  }
+}

@@ -3,6 +3,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "react-router-dom";
 
+// Header component for desktop view
+// see below mobile header component with hamburger menu and animation
+
 export function HeaderDesktop() {
   return (
     <header className="flex items-center justify-between p-4 bg-white px-10 ">
@@ -44,18 +47,22 @@ export function HeaderDesktop() {
         </div>
         {/* Action Buttons */}
         <div className="flex gap-x-3">
-          <button className="text-white bg-primary px-5 py-2 rounded-md hover:bg-blue-600">
-            Login
-          </button>
-          <button className="text-gray-600 bg-gray-200 px-3 py-2 rounded-md hover:text-gray-800">
-            Sign Up
-          </button>
+          <NavLink to="/login">
+            <button className="text-white bg-primary px-5 py-2 rounded-md hover:bg-blue-600">
+              Login
+            </button>
+          </NavLink>
+          <NavLink to="/register">
+            <button className="text-gray-600 bg-gray-200 px-3 py-2 rounded-md hover:text-gray-800">
+              Sign Up
+            </button>
+          </NavLink>
         </div>
       </div>
     </header>
   );
 }
-
+// Header component for mobile view with hamburger menu and animation
 export function HeaderMobile() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
