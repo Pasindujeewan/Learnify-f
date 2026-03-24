@@ -17,7 +17,7 @@ export type UserForm = {
   name: string;
   email: string;
   password: string;
-  avatar?: string; // URL to profile picture
+  avatar?: string | null; // URL to profile picture
   role: "student" | "instructor";
   bio?: string;
   description?: string;

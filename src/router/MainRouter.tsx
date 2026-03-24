@@ -4,6 +4,7 @@ import { Home } from "../pages/Home";
 import { Courses } from "../pages/Courses";
 import Register from "../pages/Register";
 import Login from "../pages/Login";
+import { Dashboard } from "../pages/Dashboard";
 export function MainRouter() {
   const router = createBrowserRouter([
     {
@@ -27,6 +28,10 @@ export function MainRouter() {
     {
       path: "/Login",
       element: <Login />,
+    },
+    {
+      path: "/dashboard",
+      element: <Dashboard />,
     },
   ]);
   return <RouterProvider router={router} />;

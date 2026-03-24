@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { uploadImage } from "../api/getSignature";
 import { registerUser } from "../api/registerUser";
+import { useNavigate } from "react-router-dom";
 
 const variants = {
   hidden: { opacity: 0, x: 50 },
@@ -13,6 +14,7 @@ const variants = {
 
 export default function Register() {
   const [section, setSection] = useState(1);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -39,7 +41,7 @@ export default function Register() {
       console.log("Registration response:", response);
 
       if (response.ok) {
-        alert("Registration successful! Please log in.");
+        navigate("/dashboard");
       } else {
         const errorData = await response.json();
         alert(`Registration failed: ${errorData.message || "Unknown error"}`);

@@ -1,10 +1,7 @@
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-
-type LoginForm = {
-  email: string;
-  password: string;
-};
+import type { LoginForm } from "../types/loginFormType";
+import { loginUser } from "../api/loginUser";
 
 export default function Login() {
   const {
@@ -13,8 +10,16 @@ export default function Login() {
     formState: { errors },
   } = useForm<LoginForm>();
 
-  const onSubmit = (data: LoginForm) => {
-    console.log(data);
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      const res = await loginUser(data);
+      if (!res?.ok) {
+        alert("Error occue");
+      }
+      alert("login sucese");
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
