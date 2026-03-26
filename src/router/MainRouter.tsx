@@ -4,7 +4,7 @@ import { Home } from "../pages/Home";
 import { Courses } from "../pages/Courses";
 import Register from "../pages/Register";
 import Login from "../pages/Login";
-import { Dashboard } from "../pages/Dashboard";
+import { ProtectedDashboard } from "../pages/ProtectedDashboardRoute";
 export function MainRouter() {
   const router = createBrowserRouter([
     {
@@ -31,7 +31,7 @@ export function MainRouter() {
     },
     {
       path: "/dashboard",
-      element: <Dashboard />,
+      element: <ProtectedDashboard />,
     },
   ]);
   return <RouterProvider router={router} />;

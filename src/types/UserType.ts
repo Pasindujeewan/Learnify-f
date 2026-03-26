@@ -1,7 +1,7 @@
 import type { Contact } from "./ContactType";
 
 export type User = {
-  id: number;
+  user_id: number;
   name: string;
   email: string;
   password: string;
@@ -13,7 +13,7 @@ export type User = {
 };
 
 export type UserForm = {
-  id: number;
+  user_id: number;
   name: string;
   email: string;
   password: string;

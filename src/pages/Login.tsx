@@ -2,8 +2,10 @@ import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import type { LoginForm } from "../types/loginFormType";
 import { loginUser } from "../api/loginUser";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -17,6 +19,7 @@ export default function Login() {
         alert("Error occue");
       }
       alert("login sucese");
+      navigate("/dashboard");
     } catch (e) {
       console.log(e);
     }

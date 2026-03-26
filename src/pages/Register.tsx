@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { uploadImage } from "../api/getSignature";
 import { registerUser } from "../api/registerUser";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../hook/toastHook";
 
 const variants = {
   hidden: { opacity: 0, x: 50 },
@@ -15,6 +16,7 @@ const variants = {
 export default function Register() {
   const [section, setSection] = useState(1);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const {
     register,
@@ -41,10 +43,13 @@ export default function Register() {
       console.log("Registration response:", response);
 
       if (response.ok) {
+        toast.showToast("RegisterSucess", "success");
         navigate("/dashboard");
       } else {
         const errorData = await response.json();
-        alert(`Registration failed: ${errorData.message || "Unknown error"}`);
+        if (errorData.code && errorData.code === "USER_ALREADY_EXSIST") {
+          toast.showToast("USER already exist", "error");
+        }
       }
     } catch (error) {
       console.error("Registration error:", error);
