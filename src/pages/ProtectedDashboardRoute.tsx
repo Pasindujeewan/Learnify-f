@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { verifyUser } from "../api/verifyUser";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import type { UserForm } from "../types/UserType";
+import type { UserDbType } from "../types/UserType";
 
 export function ProtectedDashboard() {
-  const [user, setUser] = useState<UserForm>();
+  const [user, setUser] = useState<UserDbType>();
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -21,5 +21,5 @@ export function ProtectedDashboard() {
     checkUser();
   }, []);
   console.log(user);
-  return <div>{}</div>;
+  return <div>{user}</div>;
 }

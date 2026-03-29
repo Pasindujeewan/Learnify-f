@@ -12,7 +12,7 @@ export type User = {
   contact: Contact;
 };
 
-export type UserForm = {
+export type UserDbType = {
   user_id: number;
   name: string;
   email: string;

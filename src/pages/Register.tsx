@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import type { User, UserForm } from "../types/UserType";
+import type { User, UserDbType } from "../types/UserType";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { uploadImage } from "../api/getSignature";
@@ -37,7 +37,7 @@ export default function Register() {
     }
 
     const { avatar, ...rest } = data;
-    const userData: UserForm = { ...rest, avatar: imageUrl };
+    const userData: UserDbType = { ...rest, avatar: imageUrl };
     try {
       const response = await registerUser(userData);
       console.log("Registration response:", response);
