@@ -1,19 +1,22 @@
 import { useEffect } from "react";
-import { verifyUser } from "../api/verifyUser";
+import { verifyUser } from "../api/getUserProfile";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import type { UserDbType } from "../types/UserType";
+import StudentDashboard from "./StudentDashboard";
+import type { StudentProfileType } from "../types/StudentType";
+import type { instructorProfileType } from "../types/instructorType";
 
 export function ProtectedDashboard() {
-  const [user, setUser] = useState<UserDbType>();
+  const [user, setUser] = useState<
+    StudentProfileType | instructorProfileType | null
+  >(null);
 
   const navigate = useNavigate();
   useEffect(() => {
     const checkUser = async () => {
       const data = await verifyUser();
-      console.log("infinite");
       if (!data) {
-        navigate("/login");
+        navigate("/login", { replace: true });
       } else {
         setUser(data);
       }
@@ -21,5 +24,13 @@ export function ProtectedDashboard() {
     checkUser();
   }, []);
   console.log(user);
-  return <div>{user}</div>;
+  if (!user) {
+    return <div className="p-6">Loading...</div>;
+  }
+
+  if (user.role === "instructor") {
+    return <div className="p-6">Instructor Dashboard - {user.name}</div>;
+  }
+
+  return <StudentDashboard user={user} />;
 }

@@ -2,7 +2,7 @@ export type Level = "Beginner" | "Intermediate" | "Advanced";
 export type Category = "Frontend" | "Data Science" | "Design";
 
 export type Course = {
-  id: number;
+  course_id: number;
   title: string;
   description: string;
   instructor: string;

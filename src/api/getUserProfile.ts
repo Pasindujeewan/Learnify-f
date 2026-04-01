@@ -1,5 +1,8 @@
-import type { UserForm } from "../types/UserType";
-export async function verifyUser() {
+import type { instructorProfileType } from "../types/instructorType";
+import type { StudentProfileType } from "../types/StudentType";
+export async function verifyUser(): Promise<
+  StudentProfileType | instructorProfileType | null
+> {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/user/me`, {
       credentials: "include",
@@ -7,10 +10,11 @@ export async function verifyUser() {
     if (!response.ok) {
       throw new Error("Failed to verify user");
     }
+
     const data = await response.json();
-    console.log(data);
-    return data.user as UserForm;
+    return data.user;
   } catch (e) {
     console.error("A error occur when verify user", e);
+    return null;
   }
 }

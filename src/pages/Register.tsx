@@ -1,12 +1,11 @@
 import { useForm } from "react-hook-form";
-import type { User, UserDbType } from "../types/UserType";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { uploadImage } from "../api/getSignature";
 import { registerUser } from "../api/registerUser";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../hook/toastHook";
-
+import type { UserRegisterForm, UserDbType } from "../types/UserType";
 const variants = {
   hidden: { opacity: 0, x: 50 },
   visible: { opacity: 1, x: 0 },
@@ -23,9 +22,9 @@ export default function Register() {
     handleSubmit,
     trigger,
     formState: { errors },
-  } = useForm<User>();
+  } = useForm<UserRegisterForm>();
 
-  const onSubmit = async (data: User) => {
+  const onSubmit = async (data: UserRegisterForm) => {
     let imageUrl = "";
     try {
       if (data.avatar?.[0]) {

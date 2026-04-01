@@ -5,6 +5,7 @@ import { FiChevronLeft, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { courses } from "../temtData/Courses";
 import CourseCard from "../components/CourseCard";
+import { useSearchParams } from "react-router-dom";
 
 const filters = [
   {
@@ -35,6 +36,9 @@ const filters = [
 ];
 
 export function Courses() {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("search");
+  const [search, setSearch] = useState(query || "");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showSubFilters, setShowSubFilters] = useState<string[]>([
     "Level",
@@ -171,6 +175,8 @@ export function Courses() {
           {/* Search */}
           <div className="relative w-full flex-1">
             <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               type="text"
               placeholder="Search courses..."
               className="pl-10 pr-3 md:w-[50%] py-2.5 rounded-lg border border-gray-200

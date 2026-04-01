@@ -1,8 +1,18 @@
 import hero from "../../assets/hero.png";
 import { FaBook, FaRocket, FaSearch } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function HeroSection() {
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    navigate(`/courses?search=${search}`);
+  };
+
   return (
     <section className="bg-gradient-to-r from-[#2563ea] via-[#204ac0] to-[#7c3aed] text-white py-16 md:py-20 px-4 md:px-20 flex flex-col md:flex-row items-center overflow-x-hidden relative">
       {/* Subtle background circles for depth */}
@@ -90,18 +100,22 @@ export function HeroSection() {
 
         {/* Search Bar */}
         <div className="relative w-full mt-8">
-          <input
-            type="text"
-            placeholder="Search courses..."
-            className="w-full pl-12 pr-4 py-3 rounded-xl border text-gray-700 placeholder-gray-400
+          <form onSubmit={handleSearchSubmit}>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              type="text"
+              placeholder="Search courses..."
+              className="w-full pl-12 pr-4 py-3 rounded-xl border text-gray-700 placeholder-gray-400
               focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
-            style={{
-              background: "rgba(255,255,255,0.95)",
-              border: "1.5px solid rgba(255,255,255,0.3)",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
-            }}
-          />
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              style={{
+                background: "rgba(255,255,255,0.95)",
+                border: "1.5px solid rgba(255,255,255,0.3)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+              }}
+            />
+            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          </form>
         </div>
 
         {/* Stats */}

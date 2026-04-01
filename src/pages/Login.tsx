@@ -19,7 +19,7 @@ export default function Login() {
         alert("Error occue");
       }
       alert("login sucese");
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (e) {
       console.log(e);
     }
