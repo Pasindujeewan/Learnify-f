@@ -1,5 +1,5 @@
 import type { UserDbType } from "./UserType";
-import type { Course } from "./courseType";
+import type { InstructorCourseType } from "./courseType";
 export type Instructor = UserDbType & {
   rating: number;
   experience: number; // in years
@@ -7,5 +7,5 @@ export type Instructor = UserDbType & {
 };
 
 export type instructorProfileType = Instructor & {
-  courses: Course[];
+  courses: InstructorCourseType[];
 };

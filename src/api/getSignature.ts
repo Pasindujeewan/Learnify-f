@@ -10,8 +10,14 @@ export const uploadImage = async (file: File) => {
       },
     );
 
-    const { timestamp, signature, apiKey, cloudName } = await res.json();
-
+    const responceData = await res.json();
+    const { timestamp, signature, apiKey, cloudName } = responceData.data;
+    console.log("Signature response:", {
+      timestamp,
+      signature,
+      apiKey,
+      cloudName,
+    });
     // upload to cloudinary
     const formData = new FormData();
     formData.append("file", file);

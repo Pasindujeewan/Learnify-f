@@ -88,13 +88,13 @@ export function Courses() {
   }, [courses, activeFilter, sortOption]);
 
   return (
-    <div className="flex mt-5 md:px-10 px-2 gap-2">
+    <div className="flex relative mt-5 md:px-10 px-2 gap-2">
       {/* filters toggle button */}
       <motion.div
         initial={{ x: 0 }}
         animate={{ x: isFilterOpen ? 255 : 0 }}
         transition={{ duration: 0.3 }}
-        className="md:hidden mb-5 absolute top-15 left-0 p-2 z-30 bg-white rounded-r-2xl shadow-lg"
+        className="md:hidden mb-5 fixed  top-16 left-0 p-2 z-30 bg-white rounded-r-2xl shadow-lg"
       >
         {isFilterOpen ? (
           <FiChevronLeft

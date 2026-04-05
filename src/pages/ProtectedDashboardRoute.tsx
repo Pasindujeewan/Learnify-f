@@ -5,32 +5,48 @@ import { useState } from "react";
 import StudentDashboard from "./StudentDashboard";
 import type { StudentProfileType } from "../types/StudentType";
 import type { instructorProfileType } from "../types/instructorType";
+import LoadingScreen from "../components/LoadingScreen";
+import { useToast } from "../hook/toastHook";
+import type { UserStateType } from "../types/UserType";
+import { useAppDispatch } from "../hook/reduxHook";
+import { setUser } from "../features/authSlice";
 
 export function ProtectedDashboard() {
-  const [user, setUser] = useState<
+  const [user, setUsers] = useState<
     StudentProfileType | instructorProfileType | null
   >(null);
-
+  const toast = useToast();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     const checkUser = async () => {
       const data = await verifyUser();
       if (!data) {
+        toast.showToast("Please login to access the dashboard", "info");
         navigate("/login", { replace: true });
       } else {
-        setUser(data);
+        setUsers(data);
+        const { userId, name, email, role, avatar }: UserStateType = data;
+        console.log("Setting user in Redux:", {
+          userId,
+          name,
+          email,
+          role,
+          avatar,
+        });
+        dispatch(setUser({ userId, name, email, role, avatar }));
       }
     };
     checkUser();
   }, []);
   console.log(user);
   if (!user) {
-    return <div className="p-6">Loading...</div>;
+    return <LoadingScreen loadPage="Dashboard" />;
   }
 
   if (user.role === "instructor") {
     return <div className="p-6">Instructor Dashboard - {user.name}</div>;
   }
 
-  return <StudentDashboard user={user} />;
+  return <StudentDashboard profile={user} />;
 }

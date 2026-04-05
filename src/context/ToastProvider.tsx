@@ -26,7 +26,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
           ? "bg-green-600"
           : toast.type === "error"
             ? "bg-red-600"
-            : "bg-blue-600"
+            : "bg-yellow-500"
       }`}
           >
             <div className="flex items-center gap-2">

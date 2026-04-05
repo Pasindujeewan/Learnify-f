@@ -25,6 +25,7 @@ export default function Register() {
   } = useForm<UserRegisterForm>();
 
   const onSubmit = async (data: UserRegisterForm) => {
+    console.log("Form data:", data);
     let imageUrl = "";
     try {
       if (data.avatar?.[0]) {

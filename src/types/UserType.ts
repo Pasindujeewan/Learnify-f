@@ -18,3 +18,10 @@ export type UserRegisterForm = Omit<UserBaseType, "user_id"> & {
   avatar?: FileList; // For file upload in registration form
   password: string;
 };
+
+export type UserStateType = Pick<
+  UserBaseType,
+  "userId" | "name" | "email" | "role"
+> & {
+  avatar?: string | null;
+};
