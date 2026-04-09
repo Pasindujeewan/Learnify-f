@@ -6,6 +6,7 @@ import { registerUser } from "../api/registerUser";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../hook/toastHook";
 import type { UserRegisterForm, UserDbType } from "../types/UserType";
+
 const variants = {
   hidden: { opacity: 0, x: 50 },
   visible: { opacity: 1, x: 0 },
@@ -16,6 +17,7 @@ export default function Register() {
   const [section, setSection] = useState(1);
   const navigate = useNavigate();
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -25,6 +27,7 @@ export default function Register() {
   } = useForm<UserRegisterForm>();
 
   const onSubmit = async (data: UserRegisterForm) => {
+    setIsLoading(true);
     console.log("Form data:", data);
     let imageUrl = "";
     try {
@@ -54,6 +57,8 @@ export default function Register() {
     } catch (error) {
       console.error("Registration error:", error);
       alert("An error occurred during registration. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,30 +95,39 @@ export default function Register() {
       </div>
 
       {/* form section */}
-      <div
-        className="md:w-[60%] w-full flex items-center justify-center md:p-8 p-4"
-        style={{ background: "#f7f8fa" }}
-      >
-        <div
-          className="md:w-[78%] w-full rounded-3xl px-6 md:px-10 py-10"
-          style={{
-            background: "#ffffff",
-            boxShadow:
-              "0 4px 6px -1px rgba(0,0,0,0.05), 0 12px 40px -8px rgba(0,0,0,0.1)",
-          }}
-        >
+      <div className="md:w-[60%] w-full flex items-center justify-center md:p-8 p-4 bg-[#f7f8fa] dark:bg-slate-950">
+        <div className="relative md:w-[78%] w-full rounded-3xl px-6 md:px-10 py-10 bg-white dark:bg-slate-900 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05),0_12px_40px_-8px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.3),0_12px_40px_-8px_rgba(0,0,0,0.4)] border dark:border-slate-800">
           {/* Header */}
           <div className="mb-8">
             <h1
-              className="text-3xl font-bold"
-              style={{ color: "#0f172a", letterSpacing: "-0.02em" }}
+              className="text-3xl font-bold text-[#0f172a] dark:text-slate-100"
+              style={{ letterSpacing: "-0.02em" }}
             >
               Create account
             </h1>
-            <p className="text-sm mt-1" style={{ color: "#64748b" }}>
+            <p className="text-sm mt-1 text-[#64748b] dark:text-slate-400">
               Fill in your details to get started.
             </p>
           </div>
+
+          <AnimatePresence>
+            {isLoading && (
+              <motion.div
+                initial={{ y: -50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                className="absolute inset-0 z-50 flex items-start justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-3xl"
+              >
+                <div className="mt-10 flex flex-col items-center">
+                  <div className="w-8 h-8 border-4 border-blue-500 dark:border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="mt-3 text-sm text-gray-700 dark:text-slate-300">
+                    Submitting...
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -184,14 +198,7 @@ export default function Register() {
                       }}
                     />
                   </div>
-                  {i < 2 && (
-                    <div
-                      style={{
-                        width: 12,
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
+                  {i < 2 && <div style={{ width: 12, flexShrink: 0 }} />}
                 </div>
               ))}
             </div>
@@ -213,12 +220,11 @@ export default function Register() {
                     <input
                       {...register("name", { required: "Name is required" })}
                       placeholder="Full Name"
-                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 ${
+                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 dark:text-slate-100 dark:placeholder-slate-500 ${
                         errors.name
-                          ? "border-red-400 bg-red-50"
-                          : "border-slate-200 bg-slate-50 focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
+                          ? "border-red-400 bg-red-50 dark:bg-red-950/40 dark:border-red-500"
+                          : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
                       }`}
-                      style={{ color: "#0f172a" }}
                     />
                     {errors.name && (
                       <p className="text-xs text-red-500 mt-1 ml-1">
@@ -231,12 +237,11 @@ export default function Register() {
                     <input
                       {...register("email", { required: "Email is required" })}
                       placeholder="Email Address"
-                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 ${
+                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 dark:text-slate-100 dark:placeholder-slate-500 ${
                         errors.email
-                          ? "border-red-400 bg-red-50"
-                          : "border-slate-200 bg-slate-50 focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
+                          ? "border-red-400 bg-red-50 dark:bg-red-950/40 dark:border-red-500"
+                          : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
                       }`}
-                      style={{ color: "#0f172a" }}
                     />
                     {errors.email && (
                       <p className="text-xs text-red-500 mt-1 ml-1">
@@ -253,12 +258,11 @@ export default function Register() {
                       })}
                       type="password"
                       placeholder="Password"
-                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 ${
+                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 dark:text-slate-100 dark:placeholder-slate-500 ${
                         errors.password
-                          ? "border-red-400 bg-red-50"
-                          : "border-slate-200 bg-slate-50 focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
+                          ? "border-red-400 bg-red-50 dark:bg-red-950/40 dark:border-red-500"
+                          : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
                       }`}
-                      style={{ color: "#0f172a" }}
                     />
                     {errors.password && (
                       <p className="text-xs text-red-500 mt-1 ml-1">
@@ -308,24 +312,20 @@ export default function Register() {
                   className="flex flex-col gap-4"
                 >
                   <div className="relative">
-                    <label
-                      className="block text-xs font-medium mb-1.5"
-                      style={{ color: "#64748b" }}
-                    >
+                    <label className="block text-xs font-medium mb-1.5 text-[#64748b] dark:text-slate-400">
                       Profile Photo
                     </label>
                     <input
                       type="file"
                       {...register("avatar")}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-500 outline-none file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-green-50 file:text-green-600 hover:file:bg-green-100 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-500 dark:text-slate-400 outline-none file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-green-50 dark:file:bg-green-900/30 file:text-green-600 dark:file:text-green-400 hover:file:bg-green-100 dark:hover:file:bg-green-900/50 transition-all"
                     />
                   </div>
 
                   <div className="relative">
                     <select
                       {...register("role")}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 appearance-none"
-                      style={{ color: "#0f172a" }}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 appearance-none text-[#0f172a] dark:text-slate-100"
                     >
                       <option value="student">Student</option>
                       <option value="instructor">Instructor</option>
@@ -337,8 +337,7 @@ export default function Register() {
                       {...register("bio")}
                       placeholder="Short bio"
                       rows={2}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 resize-none"
-                      style={{ color: "#0f172a" }}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 resize-none text-[#0f172a] dark:text-slate-100 dark:placeholder-slate-500"
                     />
                   </div>
 
@@ -347,8 +346,7 @@ export default function Register() {
                       {...register("description")}
                       placeholder="Description"
                       rows={2}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 resize-none"
-                      style={{ color: "#0f172a" }}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 resize-none text-[#0f172a] dark:text-slate-100 dark:placeholder-slate-500"
                     />
                   </div>
 
@@ -356,8 +354,7 @@ export default function Register() {
                     <button
                       type="button"
                       onClick={() => setSection(1)}
-                      className="flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98]"
-                      style={{ color: "#64748b" }}
+                      className="flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] text-[#64748b] dark:text-slate-400"
                     >
                       ← Back
                     </button>
@@ -393,12 +390,11 @@ export default function Register() {
                         required: "Contact email required",
                       })}
                       placeholder="Contact Email"
-                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 ${
+                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 dark:text-slate-100 dark:placeholder-slate-500 ${
                         errors.contact?.email
-                          ? "border-red-400 bg-red-50"
-                          : "border-slate-200 bg-slate-50 focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
+                          ? "border-red-400 bg-red-50 dark:bg-red-950/40 dark:border-red-500"
+                          : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
                       }`}
-                      style={{ color: "#0f172a" }}
                     />
                     {errors.contact?.email && (
                       <p className="text-xs text-red-500 mt-1 ml-1">
@@ -413,12 +409,11 @@ export default function Register() {
                         required: "Phone required",
                       })}
                       placeholder="Phone Number"
-                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 ${
+                      className={`w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all duration-200 dark:text-slate-100 dark:placeholder-slate-500 ${
                         errors.contact?.phone
-                          ? "border-red-400 bg-red-50"
-                          : "border-slate-200 bg-slate-50 focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
+                          ? "border-red-400 bg-red-50 dark:bg-red-950/40 dark:border-red-500"
+                          : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]"
                       }`}
-                      style={{ color: "#0f172a" }}
                     />
                     {errors.contact?.phone && (
                       <p className="text-xs text-red-500 mt-1 ml-1">
@@ -431,8 +426,7 @@ export default function Register() {
                     <input
                       {...register("contact.social.twitter")}
                       placeholder="Twitter handle"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200"
-                      style={{ color: "#0f172a" }}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 text-[#0f172a] dark:text-slate-100 dark:placeholder-slate-500"
                     />
                   </div>
 
@@ -440,8 +434,7 @@ export default function Register() {
                     <input
                       {...register("contact.social.linkedin")}
                       placeholder="LinkedIn URL"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:border-green-400 focus:bg-white focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200"
-                      style={{ color: "#0f172a" }}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:border-green-400 dark:focus:border-green-500 focus:bg-white dark:focus:bg-slate-700 focus:shadow-[0_0_0_3px_rgba(34,197,94,0.12)] transition-all duration-200 text-[#0f172a] dark:text-slate-100 dark:placeholder-slate-500"
                     />
                   </div>
 
@@ -449,8 +442,7 @@ export default function Register() {
                     <button
                       type="button"
                       onClick={() => setSection(2)}
-                      className="flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98]"
-                      style={{ color: "#64748b" }}
+                      className="flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] text-[#64748b] dark:text-slate-400"
                     >
                       ← Back
                     </button>
@@ -471,12 +463,11 @@ export default function Register() {
 
             {/* Footer */}
             <div className="flex mt-6 justify-center">
-              <p className="text-sm" style={{ color: "#94a3b8" }}>
+              <p className="text-sm text-[#94a3b8] dark:text-slate-500">
                 Already have an account?{" "}
                 <a
                   href="/login"
-                  className="font-medium hover:underline transition-colors"
-                  style={{ color: "#22c55e" }}
+                  className="font-medium hover:underline transition-colors text-[#22c55e] dark:text-green-400"
                 >
                   Sign in
                 </a>

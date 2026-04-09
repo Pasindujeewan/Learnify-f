@@ -24,7 +24,7 @@ export type Category =
   | "Other";
 
 export type Course = {
-  course_id: number;
+  course_id: string;
   title: string;
   description: string;
   instructor: string;
@@ -32,10 +32,11 @@ export type Course = {
   category: Category;
   level: Level;
   duration: number; // in hours and fraction represents minutes (0.5 = 30 minutes)
-  image: string;
+  imageUrl: string;
   rating: number;
   price: number; // in USD
   language: Language;
+  instructorName: string;
 };
 
 export type StudentCourseType = Course & {
@@ -54,3 +55,7 @@ export type courseFilters = {
   duration: Duration[];
   price: Price[];
 };
+export type CourseFormData = Omit<
+  Course,
+  "course_id" | "instructorName" | "rating"
+>;

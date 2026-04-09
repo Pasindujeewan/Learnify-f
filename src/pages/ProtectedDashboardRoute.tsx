@@ -10,6 +10,7 @@ import { useToast } from "../hook/toastHook";
 import type { UserStateType } from "../types/UserType";
 import { useAppDispatch } from "../hook/reduxHook";
 import { setUser } from "../features/authSlice";
+import InstructorDashboard from "./InstructurDashboard";
 
 export function ProtectedDashboard() {
   const [user, setUsers] = useState<
@@ -45,8 +46,8 @@ export function ProtectedDashboard() {
   }
 
   if (user.role === "instructor") {
-    return <div className="p-6">Instructor Dashboard - {user.name}</div>;
+    return <InstructorDashboard instructor={user} />;
   }
 
-  return <StudentDashboard profile={user} />;
+  return <StudentDashboard student={user} />;
 }

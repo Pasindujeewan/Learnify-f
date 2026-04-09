@@ -14,15 +14,30 @@ export function HeroSection() {
   };
 
   return (
-    <section className="bg-gradient-to-r from-[#2563ea] via-[#204ac0] to-[#7c3aed] text-white py-16 md:py-20 px-4 md:px-20 flex flex-col md:flex-row items-center overflow-x-hidden relative">
+    <section className="bg-gradient-to-r from-[#2563ea] via-[#204ac0] to-[#7c3aed] dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#0f172a] text-white py-16 md:py-20 px-4 md:px-20 flex flex-col md:flex-row items-center overflow-x-hidden relative">
       {/* Subtle background circles for depth */}
       <div
-        className="absolute top-[-60px] left-[-60px] w-72 h-72 rounded-full pointer-events-none"
+        className="absolute top-[-60px] left-[-60px] w-72 h-72 rounded-full pointer-events-none dark:opacity-30"
         style={{ background: "rgba(255,255,255,0.05)", filter: "blur(2px)" }}
       />
       <div
         className="absolute bottom-[-80px] right-[-40px] w-96 h-96 rounded-full pointer-events-none"
         style={{ background: "rgba(124,58,237,0.18)", filter: "blur(4px)" }}
+      />
+      {/* Dark mode extra glow orbs */}
+      <div
+        className="hidden dark:block absolute top-1/4 left-1/3 w-64 h-64 rounded-full pointer-events-none opacity-20"
+        style={{
+          background: "radial-gradient(circle, #6366f1 0%, transparent 70%)",
+          filter: "blur(40px)",
+        }}
+      />
+      <div
+        className="hidden dark:block absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full pointer-events-none opacity-15"
+        style={{
+          background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
+          filter: "blur(50px)",
+        }}
       />
 
       {/* LEFT CONTENT */}
@@ -44,20 +59,20 @@ export function HeroSection() {
             border: "1px solid rgba(255,255,255,0.2)",
           }}
         >
-          <FaRocket className="text-yellow-300" />
-          <span>Start learning today</span>
+          <FaRocket className="text-yellow-300 dark:text-yellow-400" />
+          <span className="dark:text-indigo-200">Start learning today</span>
         </motion.div>
 
         <h1
-          className="text-3xl md:text-5xl font-bold mb-4 leading-tight"
+          className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-white dark:text-white"
           style={{ letterSpacing: "-0.02em" }}
         >
           Unlock Your Potential with{" "}
-          <span style={{ color: "#93c5fd" }}>Learnify</span>
+          <span className="text-[#93c5fd] dark:text-indigo-400">Learnify</span>
         </h1>
 
         <p
-          className="text-sm md:text-lg mb-6 leading-relaxed"
+          className="text-sm md:text-lg mb-6 leading-relaxed dark:text-slate-400"
           style={{ color: "rgba(255,255,255,0.8)" }}
         >
           Access world-class education from top universities and industry
@@ -72,7 +87,7 @@ export function HeroSection() {
               boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
             }}
             whileTap={{ scale: 0.97 }}
-            className="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition cursor-pointer flex items-center justify-center gap-2"
+            className="bg-white dark:bg-indigo-600 dark:hover:bg-indigo-500 text-blue-600 dark:text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition cursor-pointer flex items-center justify-center gap-2 dark:border dark:border-indigo-500"
             style={{ boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}
           >
             <FaBook />
@@ -85,7 +100,7 @@ export function HeroSection() {
               boxShadow: "0 8px 24px rgba(99,102,241,0.4)",
             }}
             whileTap={{ scale: 0.97 }}
-            className="px-6 py-3 rounded-xl font-semibold transition cursor-pointer flex items-center justify-center gap-2"
+            className="px-6 py-3 rounded-xl font-semibold transition cursor-pointer flex items-center justify-center gap-2 dark:bg-transparent dark:border-indigo-500 dark:text-indigo-300 dark:hover:bg-indigo-900/40"
             style={{
               background: "rgba(255,255,255,0.15)",
               border: "1.5px solid rgba(255,255,255,0.3)",
@@ -106,15 +121,15 @@ export function HeroSection() {
               onChange={(e) => setSearch(e.target.value)}
               type="text"
               placeholder="Search courses..."
-              className="w-full pl-12 pr-4 py-3 rounded-xl border text-gray-700 placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3 rounded-xl border text-gray-700 dark:text-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:placeholder-slate-500 placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
               style={{
                 background: "rgba(255,255,255,0.95)",
                 border: "1.5px solid rgba(255,255,255,0.3)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
               }}
             />
-            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
           </form>
         </div>
 
@@ -126,17 +141,17 @@ export function HeroSection() {
           className="flex justify-center md:justify-start gap-6 md:gap-10 mt-8 flex-wrap"
         >
           <div
-            className="text-center px-4 py-3 rounded-2xl"
+            className="text-center px-4 py-3 rounded-2xl dark:bg-slate-800/60 dark:border-slate-700/60"
             style={{
               background: "rgba(255,255,255,0.08)",
               border: "1px solid rgba(255,255,255,0.12)",
             }}
           >
-            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide text-orange-400">
+            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide text-orange-400 dark:text-orange-400">
               2M+
             </h1>
             <p
-              className="text-xs md:text-sm"
+              className="text-xs md:text-sm dark:text-slate-400"
               style={{ color: "rgba(255,255,255,0.75)" }}
             >
               Active Students
@@ -144,17 +159,17 @@ export function HeroSection() {
           </div>
 
           <div
-            className="text-center px-4 py-3 rounded-2xl"
+            className="text-center px-4 py-3 rounded-2xl dark:bg-slate-800/60 dark:border-slate-700/60"
             style={{
               background: "rgba(255,255,255,0.08)",
               border: "1px solid rgba(255,255,255,0.12)",
             }}
           >
-            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide">
+            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide dark:text-indigo-300">
               500+
             </h1>
             <p
-              className="text-xs md:text-sm"
+              className="text-xs md:text-sm dark:text-slate-400"
               style={{ color: "rgba(255,255,255,0.75)" }}
             >
               Expert Instructors
@@ -162,17 +177,17 @@ export function HeroSection() {
           </div>
 
           <div
-            className="text-center px-4 py-3 rounded-2xl"
+            className="text-center px-4 py-3 rounded-2xl dark:bg-slate-800/60 dark:border-slate-700/60"
             style={{
               background: "rgba(255,255,255,0.08)",
               border: "1px solid rgba(255,255,255,0.12)",
             }}
           >
-            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide">
+            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide dark:text-indigo-300">
               10K+
             </h1>
             <p
-              className="text-xs md:text-sm"
+              className="text-xs md:text-sm dark:text-slate-400"
               style={{ color: "rgba(255,255,255,0.75)" }}
             >
               Courses Available
@@ -189,7 +204,7 @@ export function HeroSection() {
         className="w-full md:w-1/2 mt-10 md:mt-0 flex justify-center relative z-10"
       >
         <div
-          className="rounded-2xl overflow-hidden"
+          className="rounded-2xl overflow-hidden dark:border-indigo-900/60"
           style={{
             boxShadow: "0 24px 60px rgba(0,0,0,0.3)",
             border: "1.5px solid rgba(255,255,255,0.15)",
@@ -197,7 +212,7 @@ export function HeroSection() {
         >
           <img
             src={hero}
-            className="w-full max-w-md md:max-w-lg h-auto block"
+            className="w-full max-w-md md:max-w-lg h-auto block dark:brightness-90 dark:contrast-105"
             alt="Hero"
           />
         </div>

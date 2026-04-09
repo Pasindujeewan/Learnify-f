@@ -1,7 +1,8 @@
 import type { UserBaseType } from "./UserType";
 import type { StudentCourseType } from "./courseType";
 export type Student = UserBaseType & {
-  theme: string;
+  education_level: string;
+  avatar?: string | null;
 };
 
 export type StudentProfileType = Student & {
