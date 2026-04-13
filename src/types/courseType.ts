@@ -1,3 +1,5 @@
+import type { enrolledStudentShort } from "./StudentType";
+
 export type Level = "Beginner" | "Intermediate" | "Advanced";
 type Language = "English" | "Spanish" | "French" | "German";
 
@@ -59,3 +61,7 @@ export type CourseFormData = Omit<
   Course,
   "course_id" | "instructorName" | "rating"
 >;
+
+export type FullCourseType = Course & {
+  enrolledstudents: enrolledStudentShort[];
+};

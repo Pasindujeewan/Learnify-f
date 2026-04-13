@@ -14,7 +14,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="bg-gradient-to-r from-[#2563ea] via-[#204ac0] to-[#7c3aed] dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#0f172a] text-white py-16 md:py-20 px-4 md:px-20 flex flex-col md:flex-row items-center overflow-x-hidden relative">
+    <section className="bg-gradient-to-r from-[#2563ea] via-[#204ac0] to-[#7c3aed] dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#0f172a] text-white py-16 md:py-20 px-4 md:px-20 flex flex-col md:flex-row items-center  relative">
       {/* Subtle background circles for depth */}
       <div
         className="absolute top-[-60px] left-[-60px] w-72 h-72 rounded-full pointer-events-none dark:opacity-30"

@@ -12,7 +12,11 @@ import {
 } from "react-icons/fa";
 import type { Course } from "../types/courseType";
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CourseRateToggle } from "../components/StudentComponets/CourseRateToggle";
+import type { comments } from "../types/comments";
+import { getCourseComments } from "../api/getCourseComments";
+import { Comments } from "../components/Comments";
 
 const levelColors: Record<string, { bg: string; text: string }> = {
   Beginner: {
@@ -33,6 +37,16 @@ export default function CourseDetailsPage() {
   const location = useLocation();
   const course = location.state as Course;
   const [dark, setDark] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [comments, setComments] = useState<comments[] | null>(null);
+
+  useEffect(() => {
+    async function fetchComments() {
+      const data = await getCourseComments(course.course_id);
+      setComments(data);
+    }
+    fetchComments();
+  }, []);
 
   const handleOnclick = async () => {
     const courseId = course.course_id;
@@ -51,6 +65,13 @@ export default function CourseDetailsPage() {
 
   return (
     <div className={dark ? "dark" : ""}>
+      {isReviewOpen && (
+        <CourseRateToggle
+          isOpen={isReviewOpen}
+          onClose={setIsReviewOpen}
+          courseId={course.course_id}
+        />
+      )}
       <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] transition-colors duration-300 font-sans">
         {/* Dark mode toggle */}
         <div className="max-w-5xl mx-auto px-4 pt-5 flex justify-end">
@@ -243,14 +264,24 @@ export default function CourseDetailsPage() {
                   </div>
 
                   {/* CTA */}
-                  <motion.button
-                    onClick={handleOnclick}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 transition-colors text-sm tracking-wide"
-                  >
-                    Enroll Now
-                  </motion.button>
+                  <div className="flex flex-col justify-center items-center gap-2 ">
+                    <motion.button
+                      onClick={handleOnclick}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 transition-colors text-sm tracking-wide"
+                    >
+                      Enroll Now
+                    </motion.button>
+                    <p
+                      onClick={() => {
+                        setIsReviewOpen(true);
+                      }}
+                      className="text-[12px] text-yellow-500   cursor-pointer"
+                    >
+                      Rate this course
+                    </p>
+                  </div>
 
                   <p className="text-center text-[11px] text-slate-400 dark:text-slate-500">
                     30-day money-back guarantee
@@ -259,6 +290,31 @@ export default function CourseDetailsPage() {
               </div>
             </div>
           </motion.div>
+          <div className="h-px bg-slate-200 dark:bg-slate-700/60 mt-3" />
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
+              Comments
+            </h2>
+
+            <div className="space-y-4">
+              {!comments || comments.length === 0 ? (
+                <div className="text-center py-10 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">
+                    No comments yet 😔
+                  </p>
+                </div>
+              ) : (
+                comments.map((comment) => (
+                  <div
+                    key={comment.commentId}
+                    className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition"
+                  >
+                    <Comments comment={comment} />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

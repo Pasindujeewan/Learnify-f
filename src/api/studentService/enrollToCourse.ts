@@ -8,6 +8,9 @@ export async function enrollToCourse(courseId: string) {
         credentials: "include",
       },
     );
+    if (response.status == 401) {
+      localStorage.removeItem("user");
+    }
     if (!response.ok) {
       throw new Error("Failed to enroll to course");
     }

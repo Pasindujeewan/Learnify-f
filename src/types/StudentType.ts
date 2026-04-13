@@ -8,3 +8,8 @@ export type Student = UserBaseType & {
 export type StudentProfileType = Student & {
   courses: StudentCourseType[];
 };
+
+export type enrolledStudentShort = Omit<
+  StudentProfileType,
+  "education_level" | "contact" | "bio" | "description" | "role" | "courses"
+>;

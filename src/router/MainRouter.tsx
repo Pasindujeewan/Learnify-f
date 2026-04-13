@@ -6,6 +6,7 @@ import Register from "../pages/Register";
 import Login from "../pages/Login";
 import { ProtectedDashboard } from "../pages/ProtectedDashboardRoute";
 import CourseDetailsPage from "../pages/CourseDetailsPage";
+import { FullCourseDetailsPage } from "../pages/FullCoursePage";
 export function MainRouter() {
   const router = createBrowserRouter([
     {
@@ -23,6 +24,10 @@ export function MainRouter() {
         {
           path: "courses/:id",
           element: <CourseDetailsPage />,
+        },
+        {
+          path: "instructor/courses/:id",
+          element: <FullCourseDetailsPage />,
         },
       ],
     },

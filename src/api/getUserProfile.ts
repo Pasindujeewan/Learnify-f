@@ -7,6 +7,9 @@ export async function verifyUser(): Promise<
     const response = await fetch(`${import.meta.env.VITE_API_URL}/user/me`, {
       credentials: "include",
     });
+    if (response.status == 401) {
+      localStorage.removeItem("user");
+    }
     if (!response.ok) {
       throw new Error("Failed to verify user");
     }

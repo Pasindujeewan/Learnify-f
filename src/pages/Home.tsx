@@ -1,10 +1,12 @@
 import { HeroSection } from "./homePageComponents/HeroSection";
+import { FeaturedCourses } from "./homePageComponents/FeaturedCourses";
+import { ExploreCategories } from "./homePageComponents/ExploreCategories";
 export function Home() {
   return (
     <div>
       <HeroSection />
-      <p>Welcome to the Home Page</p>
-      <h1>Home </h1>
+      <FeaturedCourses />
+      <ExploreCategories />
     </div>
   );
 }
