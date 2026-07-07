@@ -4,6 +4,7 @@ import { MdRateReview } from "react-icons/md";
 import { useState } from "react";
 import type { CourseRatingType } from "../../types/RatingType";
 import { rateCourse } from "../../api/studentService/RateCourse";
+import { useToast } from "../../hook/toastHook";
 
 const LABELS = ["", "Not Satisfied", "Poor", "Okay", "Good", "Excellent"];
 
@@ -17,20 +18,24 @@ export function CourseRateToggle({ isOpen, onClose, courseId }: Props) {
   const [selectedStar, setSelectedStar] = useState(-1);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+  const toast = useToast();
   if (!isOpen) return null;
 
   const stars = new Array(5).fill(undefined);
   const activeIndex = selectedStar >= 0 ? selectedStar : rating - 1;
 
   const handleSubmit = async () => {
-    console.log("Submitting rating:", { rating, comment, courseId });
-    const res = await rateCourse({
-      rating,
-      comment,
-      courseId,
-    } as CourseRatingType);
-    console.log("Course rated successfully:", res);
-    onClose(false);
+    try {
+      await rateCourse({
+        rating,
+        comment,
+        courseId,
+      } as CourseRatingType);
+      toast.success("Thank you for helping other learners choose well.", "Review submitted");
+      onClose(false);
+    } catch (error) {
+      toast.error("Please login as a student and try again.", "Review failed");
+    }
   };
 
   return (
@@ -94,7 +99,7 @@ export function CourseRateToggle({ isOpen, onClose, courseId }: Props) {
 
         <textarea
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Share what you learned or how it helped you…"
+          placeholder="Share what you learned or how it helped you..."
           rows={3}
           className="w-full p-3 text-sm border border-zinc-200 dark:border-zinc-700 rounded-xl bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 resize-none transition"
         />

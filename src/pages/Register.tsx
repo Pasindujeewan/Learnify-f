@@ -28,35 +28,23 @@ export default function Register() {
 
   const onSubmit = async (data: UserRegisterForm) => {
     setIsLoading(true);
-    console.log("Form data:", data);
     let imageUrl = "";
     try {
       if (data.avatar?.[0]) {
         imageUrl = await uploadImage(data.avatar[0]);
-        console.log("Image uploaded successfully:", imageUrl);
       }
     } catch (error) {
-      console.error("Image upload failed:", error);
+      toast.info("Image upload failed. Continuing without a profile photo.", "Photo skipped");
     }
 
     const { avatar, ...rest } = data;
     const userData: UserDbType = { ...rest, avatar: imageUrl };
     try {
-      const response = await registerUser(userData);
-      console.log("Registration response:", response);
-
-      if (response.ok) {
-        toast.showToast("RegisterSucess", "success");
-        navigate("/dashboard");
-      } else {
-        const errorData = await response.json();
-        if (errorData.code && errorData.code === "USER_ALREADY_EXSIST") {
-          toast.showToast("USER already exist", "error");
-        }
-      }
+      await registerUser(userData);
+      toast.success("Your account was created successfully.", "Registration complete");
+      navigate("/dashboard");
     } catch (error) {
-      console.error("Registration error:", error);
-      alert("An error occurred during registration. Please try again.");
+      toast.error("Please check your details and try again.", "Registration failed");
     } finally {
       setIsLoading(false);
     }

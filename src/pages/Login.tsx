@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import type { LoginForm } from "../types/loginFormType";
 import { loginUser } from "../api/loginUser";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../hook/toastHook";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -11,17 +12,16 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>();
+  const toast = useToast();
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      const res = await loginUser(data);
-      if (!res?.ok) {
-        alert("Error occue");
-      }
-      alert("login sucese");
+      const result = await loginUser(data);
+      sessionStorage.setItem("user", JSON.stringify(result.user));
+      toast.success("Welcome back. Your dashboard is ready.", "Login successful");
       navigate("/dashboard", { replace: true });
     } catch (e) {
-      console.log(e);
+      toast.error("Email or password is not valid.", "Login failed");
     }
   };
 

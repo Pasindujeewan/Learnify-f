@@ -7,11 +7,16 @@ import Login from "../pages/Login";
 import { ProtectedDashboard } from "../pages/ProtectedDashboardRoute";
 import CourseDetailsPage from "../pages/CourseDetailsPage";
 import { FullCourseDetailsPage } from "../pages/FullCoursePage";
+import { AboutUs } from "../pages/AboutUs";
+import UploadPDF from "../pages/PdfUpload";
+import { RouteErrorFallback } from "../components/RouteErrorFallback";
+
 export function MainRouter() {
   const router = createBrowserRouter([
     {
       path: "/",
       element: <App />,
+      errorElement: <RouteErrorFallback />,
       children: [
         {
           index: true,
@@ -29,19 +34,30 @@ export function MainRouter() {
           path: "instructor/courses/:id",
           element: <FullCourseDetailsPage />,
         },
+        {
+          path: "aboutus",
+          element: <AboutUs />,
+        },
+        {
+          path: "resources/pdf",
+          element: <UploadPDF />,
+        },
       ],
     },
     {
       path: "/register",
       element: <Register />,
+      errorElement: <RouteErrorFallback />,
     },
     {
-      path: "/Login",
+      path: "/login",
       element: <Login />,
+      errorElement: <RouteErrorFallback />,
     },
     {
       path: "/dashboard",
       element: <ProtectedDashboard />,
+      errorElement: <RouteErrorFallback />,
     },
   ]);
   return <RouterProvider router={router} />;

@@ -1,8 +1,18 @@
 import { FaBars, FaSun, FaMoon } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../hook/themeHook";
+import { logoutUser } from "../api/logoutUser";
+import { useToast } from "../hook/toastHook";
+
+const navItems = [
+  { to: "/", label: "Home" },
+  { to: "/courses", label: "Courses" },
+  { to: "/dashboard", label: "Dashboard" },
+  { to: "/resources/pdf", label: "PDF Tool" },
+  { to: "/aboutus", label: "About" },
+];
 
 function ThemeToggleButton({
   theme,
@@ -49,20 +59,26 @@ function ThemeToggleButton({
 }
 
 export function HeaderDesktop() {
-  let user = null;
+  let user: { name?: string } | null = null;
   const { theme, toggleTheme } = useTheme()!;
+  const navigate = useNavigate();
+  const toast = useToast();
 
   try {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       user = JSON.parse(storedUser);
     }
   } catch (error) {
-    console.error("Invalid JSON in localStorage");
+    sessionStorage.removeItem("user");
   }
-  useEffect(() => {
-    console.log("Updated user:", user);
-  }, [user]);
+
+  const handleLogout = async () => {
+    await logoutUser().catch(() => undefined);
+    sessionStorage.removeItem("user");
+    toast.info("You have been signed out.", "Logged out");
+    navigate("/login");
+  };
 
   return (
     <header className="flex items-center justify-between px-12 py-4 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 shadow-sm dark:shadow-slate-900/50 sticky top-0 z-50 transition-colors duration-300">
@@ -76,13 +92,7 @@ export function HeaderDesktop() {
         {/* Navigation Links */}
         <nav>
           <ul className="flex items-center gap-x-7">
-            {[
-              { to: "/", label: "Home" },
-              { to: "/courses", label: "Courses" },
-              { to: "/dashboard", label: "Dashboard" },
-              { to: "/profile", label: "Profile" },
-              { to: "/about", label: "About us" },
-            ].map(({ to, label }) => (
+            {navItems.map(({ to, label }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -105,10 +115,16 @@ export function HeaderDesktop() {
           <ThemeToggleButton theme={theme} toggleTheme={toggleTheme} />
 
           {user ? (
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-3">
               <h1 className="text-gray-800 dark:text-amber-300">
                 Hello {user.name}
               </h1>
+              <button
+                onClick={handleLogout}
+                className="text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 border dark:border-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+              >
+                Logout
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-x-3">
@@ -143,12 +159,12 @@ export function HeaderMobile() {
       {/* Icons */}
       <div>
         <div className="flex items-center gap-x-2">
-          <button className="text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all duration-200">
+          <NavLink
+            to="/login"
+            className="text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all duration-200"
+          >
             Login
-          </button>
-          <button className="text-gray-700 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 active:bg-gray-300 dark:border dark:border-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200">
-            Sign Up
-          </button>
+          </NavLink>
           <button
             className={`p-2 rounded-lg transition-colors duration-200 ${
               isMenuOpen
@@ -170,13 +186,7 @@ export function HeaderMobile() {
               transition={{ duration: 0.2 }}
               className="absolute right-4 top-[calc(100%+8px)] w-52 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl dark:shadow-slate-900/60 py-2 z-10 overflow-hidden"
             >
-              {[
-                { to: "/", label: "Home" },
-                { to: "/courses", label: "Courses" },
-                { to: "/dashboard", label: "Dashboard" },
-                { to: "/profile", label: "Profile" },
-                { to: "/about", label: "About us" },
-              ].map(({ to, label }) => (
+              {navItems.map(({ to, label }) => (
                 <NavLink
                   key={to}
                   to={to}

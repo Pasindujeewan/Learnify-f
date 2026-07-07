@@ -29,8 +29,8 @@ export type Course = {
   course_id: string;
   title: string;
   description: string;
-  instructor: string;
-  instructorId: number;
+  instructor?: string;
+  instructorId?: number;
   category: Category;
   level: Level;
   duration: number; // in hours and fraction represents minutes (0.5 = 30 minutes)
@@ -39,6 +39,7 @@ export type Course = {
   price: number; // in USD
   language: Language;
   instructorName: string;
+  enrolledCount?: number;
 };
 
 export type StudentCourseType = Course & {
@@ -46,7 +47,7 @@ export type StudentCourseType = Course & {
 };
 
 export type InstructorCourseType = Course & {
-  enrolled_students: number;
+  enrolledStudents: number;
   createdAt: string | Date; // ISO date string
 };
 
@@ -59,7 +60,7 @@ export type courseFilters = {
 };
 export type CourseFormData = Omit<
   Course,
-  "course_id" | "instructorName" | "rating"
+  "course_id" | "instructor" | "instructorId" | "instructorName" | "rating" | "enrolledCount"
 >;
 
 export type FullCourseType = Course & {

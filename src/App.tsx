@@ -3,21 +3,19 @@ import { Outlet } from "react-router-dom";
 
 function App() {
   return (
-    <>
-      <div className="min-h-screen bg-gray-100 overflow-x-hidden">
-        <div className="hidden md:block">
-          <HeaderDesktop />
-        </div>
-
-        <div className="block md:hidden">
-          <HeaderMobile />
-        </div>
-
-        <main>
-          <Outlet />
-        </main>
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 overflow-x-hidden">
+      <div className="hidden md:block">
+        <HeaderDesktop />
       </div>
-    </>
+
+      <div className="block md:hidden">
+        <HeaderMobile />
+      </div>
+
+      <main>
+        <Outlet />
+      </main>
+    </div>
   );
 }
 

@@ -1,6 +1,7 @@
 import type { instructorProfileType } from "../types/instructorType";
-import CreateCourseForm from "./instructurDashboardComponents/instructurAddCourse";
+import CreateCourseForm from "./instructorDashboardComponents/InstructorAddCourse";
 import { useState } from "react";
+import CourseCard from "../components/CourseCard";
 
 type Props = {
   instructor: instructorProfileType;
@@ -87,35 +88,7 @@ export default function InstructorDashboard({ instructor }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {instructor.courses.length ? (
             instructor.courses.map((course) => (
-              <div
-                key={course.course_id}
-                className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition"
-              >
-                <img
-                  src={course.image || "/placeholder.jpg"}
-                  className="w-full aspect-video object-cover"
-                />
-
-                <div className="p-3">
-                  <h4 className="text-sm font-semibold line-clamp-2">
-                    {course.title}
-                  </h4>
-
-                  <p className="text-xs text-gray-500 mt-1">
-                    {course.category}
-                  </p>
-
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-blue-600 font-bold text-sm">
-                      ${course.price}
-                    </span>
-
-                    <span className="text-xs text-yellow-500">
-                      ⭐ {course.rating ?? "N/A"}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <CourseCard key={course.course_id} course={course} />
             ))
           ) : (
             <p className="text-gray-500 text-sm">No courses created yet.</p>

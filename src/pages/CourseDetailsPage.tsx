@@ -11,12 +11,14 @@ import {
   FaPlayCircle,
 } from "react-icons/fa";
 import type { Course } from "../types/courseType";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { CourseRateToggle } from "../components/StudentComponets/CourseRateToggle";
 import type { comments } from "../types/comments";
 import { getCourseComments } from "../api/getCourseComments";
 import { Comments } from "../components/Comments";
+import { getCourse } from "../api/getCourses";
+import { useToast } from "../hook/toastHook";
 
 const levelColors: Record<string, { bg: string; text: string }> = {
   Beginner: {
@@ -33,35 +35,77 @@ const levelColors: Record<string, { bg: string; text: string }> = {
   },
 };
 
+function toNumber(value: unknown, fallback = 0) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
 export default function CourseDetailsPage() {
   const location = useLocation();
-  const course = location.state as Course;
+  const { id } = useParams();
+  const toast = useToast();
+  const [course, setCourse] = useState<Course | null>(
+    (location.state as Course) || null,
+  );
   const [dark, setDark] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [comments, setComments] = useState<comments[] | null>(null);
 
   useEffect(() => {
+    async function loadCourse() {
+      if (!course && id) {
+        try {
+          const data = await getCourse(id);
+          setCourse(data);
+        } catch (error) {
+          toast.error("This course could not be loaded.", "Course unavailable");
+        }
+      }
+    }
+
+    loadCourse();
+  }, [course, id, toast]);
+
+  useEffect(() => {
     async function fetchComments() {
+      if (!course?.course_id) return;
+
       const data = await getCourseComments(course.course_id);
       setComments(data);
     }
     fetchComments();
-  }, []);
+  }, [course?.course_id]);
 
   const handleOnclick = async () => {
     const courseId = course.course_id;
     if (!courseId) {
-      console.error("Course ID is missing");
+      toast.error("This course cannot be enrolled right now.", "Course unavailable");
       return;
     }
-    const res = await enrollToCourse(courseId);
-    console.log(res);
+
+    try {
+      await enrollToCourse(courseId);
+      toast.success("The course was added to your dashboard.", "Enrollment saved");
+    } catch (error) {
+      toast.error("Please login as a student and try again.", "Enrollment failed");
+    }
   };
+
+  if (!course) {
+    return (
+      <div className="min-h-screen px-4 py-16 text-center text-sm text-slate-500">
+        Loading course...
+      </div>
+    );
+  }
 
   const levelStyle = levelColors[course.level] ?? {
     bg: "bg-slate-100 dark:bg-slate-800",
     text: "text-slate-600 dark:text-slate-300",
   };
+  const rating = toNumber(course.rating);
+  const duration = toNumber(course.duration);
+  const price = toNumber(course.price);
 
   return (
     <div className={dark ? "dark" : ""}>
@@ -173,7 +217,7 @@ export default function CourseDetailsPage() {
                     {
                       icon: <FaClock size={13} />,
                       label: "Duration",
-                      value: `${course.duration} hrs`,
+                      value: `${duration} hrs`,
                     },
                     {
                       icon: <FaGlobe size={13} />,
@@ -183,7 +227,7 @@ export default function CourseDetailsPage() {
                     {
                       icon: <FaStar size={13} className="text-amber-400" />,
                       label: "Rating",
-                      value: String(course.rating),
+                      value: rating.toFixed(1),
                     },
                   ].map((stat) => (
                     <div
@@ -219,7 +263,7 @@ export default function CourseDetailsPage() {
                     </p>
                     <div className="flex items-baseline gap-1">
                       <span className="text-3xl font-bold text-slate-900 dark:text-white">
-                        ${course.price}
+                        {price > 0 ? `$${price.toFixed(2)}` : "Free"}
                       </span>
                       <span className="text-slate-400 text-sm dark:text-slate-500">
                         USD
@@ -234,14 +278,14 @@ export default function CourseDetailsPage() {
                         key={i}
                         size={14}
                         className={
-                          i < Math.round(course.rating)
+                          i < Math.round(rating)
                             ? "text-amber-400"
                             : "text-slate-200 dark:text-slate-600"
                         }
                       />
                     ))}
                     <span className="text-sm font-medium text-slate-600 dark:text-slate-300 ml-1">
-                      {course.rating}
+                      {rating.toFixed(1)}
                     </span>
                   </div>
 
@@ -251,7 +295,7 @@ export default function CourseDetailsPage() {
                   <div className="space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
                     <div className="flex items-center gap-2">
                       <FaClock size={12} className="text-slate-400" />
-                      <span>{course.duration} hours of content</span>
+                      <span>{duration} hours of content</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaGlobe size={12} className="text-slate-400" />
@@ -300,7 +344,7 @@ export default function CourseDetailsPage() {
               {!comments || comments.length === 0 ? (
                 <div className="text-center py-10 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    No comments yet 😔
+                    No reviews yet.
                   </p>
                 </div>
               ) : (

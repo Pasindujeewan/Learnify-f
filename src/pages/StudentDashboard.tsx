@@ -43,14 +43,14 @@ export default function StudentDashboard({ student }: Props) {
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <p className="text-xs text-gray-500">Completed</p>
           <h3 className="text-lg font-bold text-green-600">
-            {student.courses?.filter((c) => c.completed).length || 0}
+            {student.courses?.filter((c) => c.status === "completed").length || 0}
           </h3>
         </div>
 
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <p className="text-xs text-gray-500">In Progress</p>
           <h3 className="text-lg font-bold text-blue-600">
-            {student.courses?.filter((c) => !c.completed).length || 0}
+            {student.courses?.filter((c) => c.status !== "completed").length || 0}
           </h3>
         </div>
       </div>
@@ -67,7 +67,7 @@ export default function StudentDashboard({ student }: Props) {
                 className="bg-white rounded-xl shadow-sm p-3"
               >
                 <img
-                  src={course.image || "/placeholder.jpg"}
+                  src={course.imageUrl || "/placeholder.jpg"}
                   className="w-full aspect-video object-cover rounded-md"
                 />
 
@@ -84,11 +84,13 @@ export default function StudentDashboard({ student }: Props) {
                   <div className="w-full bg-gray-200 h-2 rounded-full">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
-                      style={{ width: `${course.progress || 0}%` }}
+                      style={{
+                        width: `${course.status === "completed" ? 100 : 35}%`,
+                      }}
                     />
                   </div>
                   <p className="text-[10px] text-gray-500 mt-1">
-                    {course.progress || 0}% completed
+                  {course.status === "completed" ? 100 : 35}% completed
                   </p>
                 </div>
               </div>

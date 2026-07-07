@@ -3,7 +3,8 @@ import { useAppSelector } from "../../hook/reduxHook";
 import { selectUser } from "../../features/authSlice";
 import type { CourseFormData } from "../../types/courseType";
 import { uploadImage } from "../../api/getSignature";
-import { addCourse } from "../../api/instructurServices/AddCourses";
+import { addCourse } from "../../api/instructorServices/addCourse";
+import { useToast } from "../../hook/toastHook";
 
 type Props = {
   isOpen: boolean;
@@ -22,10 +23,11 @@ export default function CreateCourseForm({ isOpen, onClose }: Props) {
   } = useForm<formData>();
 
   const user = useAppSelector(selectUser);
+  const toast = useToast();
 
   const onSubmit = async (data: formData) => {
     if (!user || !user.userId) {
-      console.error("user not login");
+      toast.error("Please login as an instructor before creating a course.", "Not authenticated");
       return;
     }
 
@@ -33,29 +35,25 @@ export default function CreateCourseForm({ isOpen, onClose }: Props) {
 
     try {
       if (data.image?.[0]) {
-        imageUrl = await uploadImage(data.image[0]);
-        console.log("Image uploaded successfully:", imageUrl);
+        imageUrl = await uploadImage(data.image[0], "course");
       }
     } catch (error) {
-      console.error("Image upload failed:", error);
+      toast.info("Image upload failed. You can edit the course image later.", "Image skipped");
     }
 
     const { image, ...otherData } = data;
-    const instructorId = user?.userId;
 
     const formData: CourseFormData = {
       ...otherData,
-      instructorId,
       imageUrl: imageUrl,
     };
 
     try {
-      const res = await addCourse(formData);
-      console.log("Course added successfully:", res);
-    } catch (error) {
-      console.error("Failed to add course:", error);
-    } finally {
+      await addCourse(formData);
+      toast.success("Your new course is ready for learners.", "Course created");
       onClose(false);
+    } catch (error) {
+      toast.error("Please check the course details and try again.", "Course creation failed");
     }
   };
 

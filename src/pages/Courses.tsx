@@ -8,6 +8,7 @@ import CourseCard from "../components/CourseCard";
 import { useSearchParams } from "react-router-dom";
 import { getCourses } from "../api/getCourses";
 import type { Course } from "../types/courseType";
+import { useToast } from "../hook/toastHook";
 
 const filters = [
   {
@@ -37,6 +38,11 @@ const filters = [
   },
 ];
 
+function toNumber(value: unknown, fallback = 0) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
 export function Courses() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("search");
@@ -52,13 +58,31 @@ export function Courses() {
   const [activeFilter, setActiveFilter] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState("");
   const [courses, setCourses] = useState<Course[] | null>(null);
+  const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const courses = await getCourses();
-      setCourses(courses);
+      try {
+        const courses = await getCourses(48);
+        setCourses(courses);
+      } catch (error) {
+        setError("Unable to load courses right now.");
+        toast.error("Unable to load courses right now.", "Course loading failed");
+        setCourses([]);
+      }
     };
     fetchCourses();
+  }, [toast]);
+
+  useEffect(() => {
+    const updateViewport = () => setIsMobile(window.innerWidth < 768);
+
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+
+    return () => window.removeEventListener("resize", updateViewport);
   }, []);
 
   function toggleSubFilters(filterName: string) {
@@ -79,25 +103,36 @@ export function Courses() {
     if (!courses) return [];
     let result = [...courses];
 
+    const normalizedSearch = search.trim().toLowerCase();
+    if (normalizedSearch) {
+      result = result.filter((course) =>
+        [course.title, course.description, course.category, course.instructorName]
+          .filter(Boolean)
+          .some((value) => value.toLowerCase().includes(normalizedSearch)),
+      );
+    }
+
     if (activeFilter.length > 0) {
       result = result.filter(
         (c) =>
           activeFilter.includes(c.level) ||
           activeFilter.includes(c.category) ||
           activeFilter.includes(c.language) ||
-          (activeFilter.includes("Free") && c.price === 0) ||
-          (activeFilter.includes("Paid") && c.price > 0),
+          (activeFilter.includes("Free") && toNumber(c.price) === 0) ||
+          (activeFilter.includes("Paid") && toNumber(c.price) > 0),
       );
     }
 
     if (sortOption === "Popular") {
-      result.sort((a, b) => b.rating - a.rating);
+      result.sort((a, b) => toNumber(b.rating) - toNumber(a.rating));
     } else if (sortOption === "Newest") {
-      result.sort((a, b) => b.id - a.id);
+      result.sort((a, b) => Number(b.course_id) - Number(a.course_id));
+    } else if (sortOption === "Highest Rated") {
+      result.sort((a, b) => toNumber(b.rating) - toNumber(a.rating));
     }
 
     return result;
-  }, [courses, activeFilter, sortOption]);
+  }, [courses, activeFilter, search, sortOption]);
 
   return (
     <div className="flex relative  md:px-10 px-2 gap-2 py-5 dark:bg-slate-700">
@@ -123,9 +158,9 @@ export function Courses() {
 
       {/* filter section */}
       <motion.div
-        initial={{ x: window.innerWidth < 768 ? -260 : 0 }}
+        initial={{ x: isMobile ? -260 : 0 }}
         animate={{
-          x: window.innerWidth < 768 ? (isFilterOpen ? 0 : -260) : 0,
+          x: isMobile ? (isFilterOpen ? 0 : -260) : 0,
         }}
         transition={{ duration: 0.3 }}
         className="
@@ -184,7 +219,7 @@ export function Courses() {
       </motion.div>
 
       {/* courses section */}
-      <div className="flex-3 bg-white dark:bg-slate-900 rounded-2xl md:p-5 p-2 shadow-sm border border-gray-100 dark:border-slate-800">
+      <div className="flex-1 bg-white dark:bg-slate-900 rounded-lg md:p-5 p-3 shadow-sm border border-gray-100 dark:border-slate-800">
         <div className="flex md:flex-row justify-evenly items-center gap-3 w-full">
           {/* Search */}
           <div className="relative w-full flex-1">
@@ -217,9 +252,27 @@ export function Courses() {
 
         <hr className="my-6 border-gray-100 dark:border-slate-800" />
 
-        <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-5 items-center justify-center">
+        <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-5">
+          {!courses && (
+            <p className="col-span-full text-sm text-slate-500">
+              Loading courses...
+            </p>
+          )}
+
+          {error && (
+            <p className="col-span-full rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+
+          {courses && visibleCourses.length === 0 && !error && (
+            <p className="col-span-full rounded-lg border border-dashed border-slate-300 px-4 py-10 text-center text-sm text-slate-500">
+              No courses match your current filters.
+            </p>
+          )}
+
           {visibleCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard key={course.course_id} course={course} />
           ))}
         </div>
       </div>

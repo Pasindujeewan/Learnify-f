@@ -1,12 +1,15 @@
 import { HeroSection } from "./homePageComponents/HeroSection";
 import { FeaturedCourses } from "./homePageComponents/FeaturedCourses";
-import { ExploreCategories } from "./homePageComponents/ExploreCategories";
+import { ExploreLearningCategories } from "./homePageComponents/ExploreLearningCategories";
+import { LearningExperienceSections } from "./homePageComponents/LearningExperienceSections";
+
 export function Home() {
   return (
-    <div>
+    <div className="bg-slate-50 dark:bg-slate-950">
       <HeroSection />
+      <ExploreLearningCategories />
       <FeaturedCourses />
-      <ExploreCategories />
+      <LearningExperienceSections />
     </div>
   );
 }

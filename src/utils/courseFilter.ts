@@ -1,4 +1,4 @@
-import { getDurationLabel } from "./getDuratinonLabel";
+import { getDurationLabel } from "./getDurationLabel";
 import type { Course, courseFilters } from "../types/courseType";
 
 type Props = {

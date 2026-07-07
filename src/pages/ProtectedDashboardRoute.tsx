@@ -10,7 +10,7 @@ import { useToast } from "../hook/toastHook";
 import type { UserStateType } from "../types/UserType";
 import { useAppDispatch } from "../hook/reduxHook";
 import { setUser } from "../features/authSlice";
-import InstructorDashboard from "./InstructurDashboard";
+import InstructorDashboard from "./InstructorDashboard";
 
 export function ProtectedDashboard() {
   const [user, setUsers] = useState<
@@ -23,24 +23,16 @@ export function ProtectedDashboard() {
     const checkUser = async () => {
       const data = await verifyUser();
       if (!data) {
-        toast.showToast("Please login to access the dashboard", "info");
+        toast.info("Please login to access your dashboard.", "Authentication required");
         navigate("/login", { replace: true });
       } else {
         setUsers(data);
         const { userId, name, email, role, avatar }: UserStateType = data;
-        console.log("Setting user in Redux:", {
-          userId,
-          name,
-          email,
-          role,
-          avatar,
-        });
         dispatch(setUser({ userId, name, email, role, avatar }));
       }
     };
     checkUser();
-  }, []);
-  console.log(user);
+  }, [dispatch, navigate, toast]);
   if (!user) {
     return <LoadingScreen loadPage="Dashboard" />;
   }

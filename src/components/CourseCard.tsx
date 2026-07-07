@@ -7,15 +7,23 @@ export type CourseCardProps = {
   course: Partial<Course>;
 };
 
+function toNumber(value: unknown, fallback = 0) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
 export default function CourseCard({ course }: CourseCardProps) {
   const navigate = useNavigate();
-  let user = null;
+  const rating = course.rating == null ? null : toNumber(course.rating);
+  const duration = course.duration == null ? null : toNumber(course.duration);
+  const price = course.price == null ? null : toNumber(course.price);
+  let user: { role?: string } | null = null;
   try {
-    user = localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user") || "null")
+    user = sessionStorage.getItem("user")
+      ? JSON.parse(sessionStorage.getItem("user") || "null")
       : null;
   } catch (error) {
-    console.error("Failed to parse user from localStorage:", error);
+    sessionStorage.removeItem("user");
   }
 
   function handleCardClick() {
@@ -27,11 +35,14 @@ export default function CourseCard({ course }: CourseCardProps) {
   }
 
   return (
-    <div className="w-full max-w-[350px] rounded-2xl overflow-hidden shadow-md bg-white dark:bg-[#132045] border border-gray-100 dark:border-[#1e3160] hover:shadow-xl dark:hover:shadow-blue-900/30 transition duration-300 cursor-pointer">
+    <article
+      onClick={handleCardClick}
+      className="w-full rounded-lg overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:shadow-md transition duration-300 cursor-pointer"
+    >
       {/* Image */}
       <div className="relative">
         <img
-          src={course.image_url || "/placeholder.jpg"}
+          src={course.imageUrl || "/placeholder.jpg"}
           alt={course.title || "Course image"}
           className="w-full aspect-video object-cover"
         />
@@ -61,13 +72,13 @@ export default function CourseCard({ course }: CourseCardProps) {
           <div className="flex items-center gap-1 text-yellow-500">
             <FaStar className="text-[11px]" />
             <span className="font-medium text-gray-700 dark:text-slate-300">
-              {course.rating != null ? course.rating.toFixed(1) : "No rating"}
+              {rating != null ? rating.toFixed(1) : "No rating"}
             </span>
           </div>
           <div className="flex items-center gap-1 text-blue-400 dark:text-blue-400">
             <FiClock className="text-[11px]" />
             <span>
-              {course.duration != null ? `${course.duration}h` : "N/A"}
+              {duration != null ? `${duration}h` : "N/A"}
             </span>
           </div>
         </div>
@@ -75,10 +86,13 @@ export default function CourseCard({ course }: CourseCardProps) {
         {/* Price + Button */}
         <div className="mt-1 flex items-center justify-between">
           <span className="font-bold text-base text-blue-600 dark:text-blue-400">
-            {course.price != null ? `$${course.price}` : "Free"}
+            {price != null && price > 0 ? `$${price.toFixed(2)}` : "Free"}
           </span>
           <button
-            onClick={handleCardClick}
+            onClick={(event) => {
+              event.stopPropagation();
+              handleCardClick();
+            }}
             className="text-xs bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition font-medium"
           >
             {!user
@@ -89,6 +103,6 @@ export default function CourseCard({ course }: CourseCardProps) {
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -18,7 +18,8 @@ import {
   Sun,
 } from "lucide-react";
 import type { FullCourseType } from "../types/courseType";
-import { getFullCourse } from "../api/instructurServices/GetFullCourse";
+import { getFullCourse } from "../api/instructorServices/getFullCourse";
+import { useToast } from "../hook/toastHook";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -70,12 +71,18 @@ const AVATAR_COLORS = [
   },
 ];
 
+function toNumber(value: unknown, fallback = 0) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
 export const FullCourseDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [course, setCourse] = useState<FullCourseType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dark, setDark] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     if (!id) return;
@@ -83,15 +90,19 @@ export const FullCourseDetailsPage = () => {
       try {
         setLoading(true);
         const data = await getFullCourse(id);
+        if (!data) {
+          throw new Error("Course not found");
+        }
         setCourse(data);
       } catch {
         setError("Failed to load course");
+        toast.error("Instructor course details could not be loaded.", "Course loading failed");
       } finally {
         setLoading(false);
       }
     };
     loadCourse();
-  }, [id]);
+  }, [id, toast]);
 
   // Sync dark class on root — or wire to your app-level theme context
   useEffect(() => {
@@ -122,23 +133,12 @@ export const FullCourseDetailsPage = () => {
       </div>
     );
 
+  const rating = toNumber(course.rating);
+  const duration = toNumber(course.duration);
+  const price = toNumber(course.price);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-      {/* Dark mode toggle */}
-      <div className="flex justify-end px-4 pt-4 sm:px-6">
-        <button
-          onClick={() => setDark((d) => !d)}
-          className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        >
-          {dark ? (
-            <Sun className="w-3.5 h-3.5" />
-          ) : (
-            <Moon className="w-3.5 h-3.5" />
-          )}
-          {dark ? "Light" : "Dark"}
-        </button>
-      </div>
-
       <AnimatePresence>
         <motion.div
           className="p-4 sm:p-6 max-w-5xl mx-auto space-y-4 sm:space-y-5"
@@ -183,7 +183,7 @@ export const FullCourseDetailsPage = () => {
                     <Globe className="w-3 h-3" /> {course.language}
                   </span>
                   <span className="inline-flex items-center gap-1.5 bg-amber-50 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 text-xs font-medium px-2.5 py-1 rounded-full">
-                    <Clock className="w-3 h-3" /> {course.duration}h
+                    <Clock className="w-3 h-3" /> {duration}h
                   </span>
                 </div>
 
@@ -192,14 +192,14 @@ export const FullCourseDetailsPage = () => {
                   <div className="flex items-center gap-1.5">
                     <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                     <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                      {course.rating}
+                      {rating.toFixed(1)}
                     </span>
                   </div>
                   <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
                   <div className="flex items-center gap-1">
                     <DollarSign className="w-4 h-4 text-gray-700 dark:text-gray-300" />
                     <span className="text-base font-semibold text-gray-900 dark:text-gray-50">
-                      {course.price}
+                      {price > 0 ? price.toFixed(2) : "Free"}
                     </span>
                   </div>
                   <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 hidden sm:block" />
@@ -234,7 +234,7 @@ export const FullCourseDetailsPage = () => {
                   {
                     icon: Clock,
                     label: "Duration",
-                    value: `${course.duration} hours`,
+                    value: `${duration} hours`,
                   },
                   { icon: Globe, label: "Language", value: course.language },
                 ].map(({ icon: Icon, label, value }) => (
@@ -270,9 +270,9 @@ export const FullCourseDetailsPage = () => {
                   {
                     icon: Clock,
                     label: "Duration",
-                    value: `${course.duration}h`,
+                    value: `${duration}h`,
                   },
-                  { icon: Star, label: "Rating", value: course.rating },
+                  { icon: Star, label: "Rating", value: rating.toFixed(1) },
                   { icon: Award, label: "Level", value: course.level },
                 ].map(({ icon: Icon, label, value }) => (
                   <motion.div
@@ -360,6 +360,10 @@ export const FullCourseDetailsPage = () => {
               </motion.div>
             )}
           </motion.div>
+          {/** Video lession Section  */}
+          <div>
+            
+          </div>
         </motion.div>
       </AnimatePresence>
     </div>

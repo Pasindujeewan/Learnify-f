@@ -1,6 +1,7 @@
 import hero from "../../assets/hero.png";
-import { FaBook, FaRocket, FaSearch } from "react-icons/fa";
+import { ArrowRight, BookOpen, Search, ShieldCheck, Users } from "lucide-react";
 import { motion } from "framer-motion";
+import type { FormEvent } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,215 +9,109 @@ export function HeroSection() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     navigate(`/courses?search=${search}`);
   };
 
   return (
-    <section className="bg-gradient-to-r from-[#2563ea] via-[#204ac0] to-[#7c3aed] dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#0f172a] text-white py-16 md:py-20 px-4 md:px-20 flex flex-col md:flex-row items-center  relative">
-      {/* Subtle background circles for depth */}
-      <div
-        className="absolute top-[-60px] left-[-60px] w-72 h-72 rounded-full pointer-events-none dark:opacity-30"
-        style={{ background: "rgba(255,255,255,0.05)", filter: "blur(2px)" }}
+    <section className="relative min-h-[calc(100vh-72px)] overflow-hidden bg-slate-950 text-white">
+      <img
+        src={hero}
+        alt="Students learning online"
+        className="absolute inset-0 h-full w-full object-cover opacity-65"
       />
-      <div
-        className="absolute bottom-[-80px] right-[-40px] w-96 h-96 rounded-full pointer-events-none"
-        style={{ background: "rgba(124,58,237,0.18)", filter: "blur(4px)" }}
-      />
-      {/* Dark mode extra glow orbs */}
-      <div
-        className="hidden dark:block absolute top-1/4 left-1/3 w-64 h-64 rounded-full pointer-events-none opacity-20"
-        style={{
-          background: "radial-gradient(circle, #6366f1 0%, transparent 70%)",
-          filter: "blur(40px)",
-        }}
-      />
-      <div
-        className="hidden dark:block absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full pointer-events-none opacity-15"
-        style={{
-          background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
-          filter: "blur(50px)",
-        }}
-      />
+      <div className="absolute inset-0 bg-slate-950/70" />
+      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-50 to-transparent dark:from-slate-950" />
 
-      {/* LEFT CONTENT */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full md:w-1/2 flex flex-col text-center md:text-left relative z-10"
-      >
-        {/* Badge */}
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-72px)] max-w-7xl flex-col justify-center px-4 pb-24 pt-16 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          className="inline-flex items-center gap-2 self-center md:self-start mb-4 px-3 py-1 rounded-full text-xs font-semibold"
-          style={{
-            background: "rgba(255,255,255,0.15)",
-            backdropFilter: "blur(6px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-          }}
+          transition={{ duration: 0.55 }}
+          className="max-w-3xl"
         >
-          <FaRocket className="text-yellow-300 dark:text-yellow-400" />
-          <span className="dark:text-indigo-200">Start learning today</span>
-        </motion.div>
+          <span className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-cyan-100 backdrop-blur">
+            <ShieldCheck size={15} />
+            Career-ready learning platform
+          </span>
 
-        <h1
-          className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-white dark:text-white"
-          style={{ letterSpacing: "-0.02em" }}
-        >
-          Unlock Your Potential with{" "}
-          <span className="text-[#93c5fd] dark:text-indigo-400">Learnify</span>
-        </h1>
+          <h1 className="mt-6 max-w-3xl text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+            Learnify
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-200 sm:text-lg">
+            Build job-ready skills with structured courses, instructor-led
+            lessons, progress tracking, reviews, and practical resources in one
+            complete online LMS.
+          </p>
 
-        <p
-          className="text-sm md:text-lg mb-6 leading-relaxed dark:text-slate-400"
-          style={{ color: "rgba(255,255,255,0.8)" }}
-        >
-          Access world-class education from top universities and industry
-          experts. Start your learning journey today with over 10,000+ courses.
-        </p>
-
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
-          <motion.button
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-            }}
-            whileTap={{ scale: 0.97 }}
-            className="bg-white dark:bg-indigo-600 dark:hover:bg-indigo-500 text-blue-600 dark:text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition cursor-pointer flex items-center justify-center gap-2 dark:border dark:border-indigo-500"
-            style={{ boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="mt-8 flex max-w-2xl flex-col gap-3 rounded-lg border border-white/15 bg-white p-2 shadow-2xl sm:flex-row"
           >
-            <FaBook />
-            Browse Courses
-          </motion.button>
-
-          <motion.button
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 8px 24px rgba(99,102,241,0.4)",
-            }}
-            whileTap={{ scale: 0.97 }}
-            className="px-6 py-3 rounded-xl font-semibold transition cursor-pointer flex items-center justify-center gap-2 dark:bg-transparent dark:border-indigo-500 dark:text-indigo-300 dark:hover:bg-indigo-900/40"
-            style={{
-              background: "rgba(255,255,255,0.15)",
-              border: "1.5px solid rgba(255,255,255,0.3)",
-              backdropFilter: "blur(6px)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
-            }}
-          >
-            <FaRocket />
-            Get Started
-          </motion.button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative w-full mt-8">
-          <form onSubmit={handleSearchSubmit}>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              type="text"
-              placeholder="Search courses..."
-              className="w-full pl-12 pr-4 py-3 rounded-xl border text-gray-700 dark:text-slate-200 dark:bg-slate-800/80 dark:border-slate-700 dark:placeholder-slate-500 placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-              style={{
-                background: "rgba(255,255,255,0.95)",
-                border: "1.5px solid rgba(255,255,255,0.3)",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
-              }}
-            />
-            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+            <div className="relative flex-1">
+              <Search
+                size={20}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                type="text"
+                placeholder="Search courses, skills, or instructors"
+                className="h-12 w-full rounded-lg border-0 pl-10 pr-3 text-sm text-slate-800 outline-none placeholder:text-slate-400"
+              />
+            </div>
+            <button className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700">
+              Search
+              <ArrowRight size={17} />
+            </button>
           </form>
-        </div>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.4 }}
-          className="flex justify-center md:justify-start gap-6 md:gap-10 mt-8 flex-wrap"
-        >
-          <div
-            className="text-center px-4 py-3 rounded-2xl dark:bg-slate-800/60 dark:border-slate-700/60"
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
-            }}
-          >
-            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide text-orange-400 dark:text-orange-400">
-              2M+
-            </h1>
-            <p
-              className="text-xs md:text-sm dark:text-slate-400"
-              style={{ color: "rgba(255,255,255,0.75)" }}
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={() => navigate("/courses")}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
             >
-              Active Students
-            </p>
+              <BookOpen size={18} />
+              Browse Courses
+            </button>
+            <button
+              onClick={() => navigate("/register")}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
+            >
+              Start Free
+              <ArrowRight size={18} />
+            </button>
           </div>
 
-          <div
-            className="text-center px-4 py-3 rounded-2xl dark:bg-slate-800/60 dark:border-slate-700/60"
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
-            }}
-          >
-            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide dark:text-indigo-300">
-              500+
-            </h1>
-            <p
-              className="text-xs md:text-sm dark:text-slate-400"
-              style={{ color: "rgba(255,255,255,0.75)" }}
-            >
-              Expert Instructors
-            </p>
-          </div>
-
-          <div
-            className="text-center px-4 py-3 rounded-2xl dark:bg-slate-800/60 dark:border-slate-700/60"
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
-            }}
-          >
-            <h1 className="text-lg md:text-3xl font-bold mb-0.5 tracking-wide dark:text-indigo-300">
-              10K+
-            </h1>
-            <p
-              className="text-xs md:text-sm dark:text-slate-400"
-              style={{ color: "rgba(255,255,255,0.75)" }}
-            >
-              Courses Available
-            </p>
+          <div className="mt-10 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+            {[
+              ["12K+", "Lessons published"],
+              ["480+", "Expert instructors"],
+              ["94%", "Learner satisfaction"],
+            ].map(([value, label]) => (
+              <div
+                key={label}
+                className="rounded-lg border border-white/15 bg-white/10 px-4 py-4 backdrop-blur"
+              >
+                <p className="text-2xl font-bold">{value}</p>
+                <p className="mt-1 text-xs text-slate-300">{label}</p>
+              </div>
+            ))}
           </div>
         </motion.div>
-      </motion.div>
 
-      {/* IMAGE */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.7 }}
-        className="w-full md:w-1/2 mt-10 md:mt-0 flex justify-center relative z-10"
-      >
-        <div
-          className="rounded-2xl overflow-hidden dark:border-indigo-900/60"
-          style={{
-            boxShadow: "0 24px 60px rgba(0,0,0,0.3)",
-            border: "1.5px solid rgba(255,255,255,0.15)",
-          }}
-        >
-          <img
-            src={hero}
-            className="w-full max-w-md md:max-w-lg h-auto block dark:brightness-90 dark:contrast-105"
-            alt="Hero"
-          />
+        <div className="absolute bottom-6 left-4 right-4 z-10 mx-auto hidden max-w-7xl items-center justify-between rounded-lg border border-slate-200 bg-white px-5 py-4 text-slate-900 shadow-lg md:flex dark:border-slate-800 dark:bg-slate-900 dark:text-white">
+          <div className="flex items-center gap-3">
+            <Users className="text-emerald-600" size={22} />
+            <span className="text-sm font-semibold">
+              Continue below to explore categories, featured courses, and LMS tools.
+            </span>
+          </div>
+          <span className="text-xs text-slate-500">Built for students and instructors</span>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

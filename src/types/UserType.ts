@@ -10,11 +10,11 @@ export type UserBaseType = {
   contact: Contact;
 };
 
-export type UserDbType = Omit<UserBaseType, "user_id"> & {
+export type UserDbType = Omit<UserBaseType, "userId"> & {
   avatar?: string | null; // URL to profile picture
   password: string;
 };
-export type UserRegisterForm = Omit<UserBaseType, "user_id"> & {
+export type UserRegisterForm = Omit<UserBaseType, "userId"> & {
   avatar?: FileList; // For file upload in registration form
   password: string;
 };
