@@ -5,6 +5,7 @@ export function RouteErrorFallback() {
   const error = useRouteError();
   const navigate = useNavigate();
 
+  // React Router can provide route responses or normal thrown Errors.
   const message = isRouteErrorResponse(error)
     ? error.statusText || error.data?.message
     : error instanceof Error

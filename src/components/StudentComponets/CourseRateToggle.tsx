@@ -22,18 +22,23 @@ export function CourseRateToggle({ isOpen, onClose, courseId }: Props) {
   if (!isOpen) return null;
 
   const stars = new Array(5).fill(undefined);
+  // Hover state previews the stars without replacing the saved selection.
   const activeIndex = selectedStar >= 0 ? selectedStar : rating - 1;
 
   const handleSubmit = async () => {
     try {
+      // Submitting again updates the student's existing review for this course.
       await rateCourse({
         rating,
         comment,
         courseId,
       } as CourseRatingType);
-      toast.success("Thank you for helping other learners choose well.", "Review submitted");
+      toast.success(
+        "Thank you for helping other learners choose well.",
+        "Review submitted",
+      );
       onClose(false);
-    } catch (error) {
+    } catch {
       toast.error("Please login as a student and try again.", "Review failed");
     }
   };

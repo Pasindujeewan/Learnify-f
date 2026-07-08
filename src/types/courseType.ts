@@ -1,4 +1,5 @@
 import type { enrolledStudentShort } from "./StudentType";
+import type { Lesson } from "./lessonType";
 
 export type Level = "Beginner" | "Intermediate" | "Advanced";
 type Language = "English" | "Spanish" | "French" | "German";
@@ -44,11 +45,16 @@ export type Course = {
 
 export type StudentCourseType = Course & {
   status: "completed" | "in-progress";
+  progress?: number;
+  completedLessons?: number;
+  totalLessons?: number;
+  courseCompleted?: boolean;
 };
 
 export type InstructorCourseType = Course & {
   enrolledStudents: number;
   createdAt: string | Date; // ISO date string
+  lessons?: Lesson[];
 };
 
 export type courseFilters = {
@@ -65,4 +71,5 @@ export type CourseFormData = Omit<
 
 export type FullCourseType = Course & {
   enrolledstudents: enrolledStudentShort[];
+  lessons?: Lesson[];
 };

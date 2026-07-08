@@ -34,25 +34,31 @@ export default function CreateCourseForm({ isOpen, onClose }: Props) {
     let imageUrl = "";
 
     try {
+      // Course images upload to Cloudinary first; the API stores only the final URL.
       if (data.image?.[0]) {
         imageUrl = await uploadImage(data.image[0], "course");
       }
-    } catch (error) {
+    } catch {
       toast.info("Image upload failed. You can edit the course image later.", "Image skipped");
     }
 
-    const { image, ...otherData } = data;
-
     const formData: CourseFormData = {
-      ...otherData,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      level: data.level,
+      duration: data.duration,
+      price: data.price,
+      language: data.language,
       imageUrl: imageUrl,
     };
 
     try {
+      // The backend reads instructor ownership from the auth cookie, not this form.
       await addCourse(formData);
       toast.success("Your new course is ready for learners.", "Course created");
       onClose(false);
-    } catch (error) {
+    } catch {
       toast.error("Please check the course details and try again.", "Course creation failed");
     }
   };

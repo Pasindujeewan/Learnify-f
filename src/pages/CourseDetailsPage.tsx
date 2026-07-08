@@ -11,7 +11,7 @@ import {
   FaPlayCircle,
 } from "react-icons/fa";
 import type { Course } from "../types/courseType";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { CourseRateToggle } from "../components/StudentComponets/CourseRateToggle";
 import type { comments } from "../types/comments";
@@ -19,6 +19,8 @@ import { getCourseComments } from "../api/getCourseComments";
 import { Comments } from "../components/Comments";
 import { getCourse } from "../api/getCourses";
 import { useToast } from "../hook/toastHook";
+import { getPublicCourseLessons } from "../api/lessonService";
+import type { Lesson } from "../types/lessonType";
 
 const levelColors: Record<string, { bg: string; text: string }> = {
   Beginner: {
@@ -36,12 +38,14 @@ const levelColors: Record<string, { bg: string; text: string }> = {
 };
 
 function toNumber(value: unknown, fallback = 0) {
+  // Database numeric fields may be serialized as strings by the API.
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
 
 export default function CourseDetailsPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { id } = useParams();
   const toast = useToast();
   const [course, setCourse] = useState<Course | null>(
@@ -50,6 +54,7 @@ export default function CourseDetailsPage() {
   const [dark, setDark] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [comments, setComments] = useState<comments[] | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
 
   useEffect(() => {
     async function loadCourse() {
@@ -57,7 +62,7 @@ export default function CourseDetailsPage() {
         try {
           const data = await getCourse(id);
           setCourse(data);
-        } catch (error) {
+        } catch {
           toast.error("This course could not be loaded.", "Course unavailable");
         }
       }
@@ -76,6 +81,22 @@ export default function CourseDetailsPage() {
     fetchComments();
   }, [course?.course_id]);
 
+  useEffect(() => {
+    async function loadLessons() {
+      if (!course?.course_id) return;
+
+      try {
+        // Public lessons are an outline only; completion happens on the enrolled learn page.
+        const data = await getPublicCourseLessons(course.course_id);
+        setLessons(data);
+      } catch {
+        setLessons([]);
+      }
+    }
+
+    loadLessons();
+  }, [course?.course_id, toast]);
+
   const handleOnclick = async () => {
     const courseId = course.course_id;
     if (!courseId) {
@@ -84,9 +105,11 @@ export default function CourseDetailsPage() {
     }
 
     try {
+      // Enrollment returns the student to the dedicated lesson player with progress tracking.
       await enrollToCourse(courseId);
       toast.success("The course was added to your dashboard.", "Enrollment saved");
-    } catch (error) {
+      navigate(`/courses/${courseId}/learn`);
+    } catch {
       toast.error("Please login as a student and try again.", "Enrollment failed");
     }
   };
@@ -106,6 +129,10 @@ export default function CourseDetailsPage() {
   const rating = toNumber(course.rating);
   const duration = toNumber(course.duration);
   const price = toNumber(course.price);
+  const totalLessonMinutes = lessons.reduce(
+    (sum, lesson) => sum + toNumber(lesson.estimatedMinutes),
+    0,
+  );
 
   return (
     <div className={dark ? "dark" : ""}>
@@ -315,7 +342,7 @@ export default function CourseDetailsPage() {
                       whileTap={{ scale: 0.97 }}
                       className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 transition-colors text-sm tracking-wide"
                     >
-                      Enroll Now
+                      Enroll and start lessons
                     </motion.button>
                     <p
                       onClick={() => {
@@ -335,6 +362,64 @@ export default function CourseDetailsPage() {
             </div>
           </motion.div>
           <div className="h-px bg-slate-200 dark:bg-slate-700/60 mt-3" />
+          <section className="mt-8">
+            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+                  Lessons
+                </p>
+                <h2 className="mt-1 text-xl font-bold text-slate-800 dark:text-slate-100">
+                  Lesson outline
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Enroll to open the dedicated lesson page with progress tracking.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate(`/courses/${course.course_id}/learn`)}
+                className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900"
+              >
+                Start lessons
+              </button>
+            </div>
+
+            {lessons.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900">
+                No lessons have been added to this course yet.
+              </div>
+            ) : (
+              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+                <div className="mb-4 flex items-center justify-between text-sm">
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">
+                    {lessons.length} lessons
+                  </span>
+                  <span className="text-slate-500">
+                    {totalLessonMinutes} estimated minutes
+                  </span>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {lessons.map((lesson) => (
+                    <div
+                      key={lesson.lesson_id}
+                      className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
+                        Lesson {lesson.order}
+                      </p>
+                      <h3 className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                        {lesson.title}
+                      </h3>
+                      <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">
+                        {lesson.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+
+          <div className="h-px bg-slate-200 dark:bg-slate-700/60 mt-8" />
           <div className="mt-8">
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
               Comments

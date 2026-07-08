@@ -9,6 +9,8 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
 };
+
+// Redux keeps only the lightweight identity needed by navigation and shared UI.
 const authSlice = createSlice({
   name: "auth",
   initialState,

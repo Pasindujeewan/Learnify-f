@@ -39,6 +39,7 @@ const filters = [
 ];
 
 function toNumber(value: unknown, fallback = 0) {
+  // Course price/rating values can be strings after JSON serialization.
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
@@ -67,7 +68,7 @@ export function Courses() {
       try {
         const courses = await getCourses(48);
         setCourses(courses);
-      } catch (error) {
+      } catch {
         setError("Unable to load courses right now.");
         toast.error("Unable to load courses right now.", "Course loading failed");
         setCourses([]);
@@ -79,6 +80,7 @@ export function Courses() {
   useEffect(() => {
     const updateViewport = () => setIsMobile(window.innerWidth < 768);
 
+    // The filter panel uses slide-in behavior only on mobile widths.
     updateViewport();
     window.addEventListener("resize", updateViewport);
 
@@ -103,6 +105,7 @@ export function Courses() {
     if (!courses) return [];
     let result = [...courses];
 
+    // Filtering and sorting are kept client-side while the API returns the course catalog.
     const normalizedSearch = search.trim().toLowerCase();
     if (normalizedSearch) {
       result = result.filter((course) =>

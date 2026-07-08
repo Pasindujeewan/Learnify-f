@@ -5,6 +5,7 @@ type ApiOptions = RequestInit & {
 };
 
 export async function apiRequest<T>(path: string, options: ApiOptions = {}): Promise<T> {
+  // Centralizes API base URL, JSON headers, cookies, and error parsing.
   const response = await fetch(`${API_BASE_URL}${path}`, {
     credentials: options.auth === false ? "same-origin" : "include",
     headers: {
@@ -14,6 +15,7 @@ export async function apiRequest<T>(path: string, options: ApiOptions = {}): Pro
     ...options,
   });
 
+  // Some failed responses may not include JSON, so parsing must be defensive.
   const payload = await response.json().catch(() => null);
 
   if (!response.ok) {

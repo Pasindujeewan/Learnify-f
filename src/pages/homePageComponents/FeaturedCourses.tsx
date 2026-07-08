@@ -30,7 +30,7 @@ export function FeaturedCourses() {
       try {
         const courses = await getCourses(6);
         setFeaturedCourses(courses);
-      } catch (error) {
+      } catch {
         setFeaturedCourses([]);
         toast.error("Featured courses could not be loaded.", "Courses unavailable");
       }

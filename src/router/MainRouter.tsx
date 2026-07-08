@@ -10,8 +10,10 @@ import { FullCourseDetailsPage } from "../pages/FullCoursePage";
 import { AboutUs } from "../pages/AboutUs";
 import UploadPDF from "../pages/PdfUpload";
 import { RouteErrorFallback } from "../components/RouteErrorFallback";
+import { LessonLearningPage } from "../pages/LessonLearningPage";
 
 export function MainRouter() {
+  // Route-level fallbacks prevent render errors from showing React Router's default crash page.
   const router = createBrowserRouter([
     {
       path: "/",
@@ -29,6 +31,10 @@ export function MainRouter() {
         {
           path: "courses/:id",
           element: <CourseDetailsPage />,
+        },
+        {
+          path: "courses/:id/learn",
+          element: <LessonLearningPage />,
         },
         {
           path: "instructor/courses/:id",

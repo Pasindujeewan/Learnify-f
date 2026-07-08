@@ -16,11 +16,12 @@ export default function Login() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
+      // Successful login stores a lightweight user copy; the cookie remains the source of truth.
       const result = await loginUser(data);
       sessionStorage.setItem("user", JSON.stringify(result.user));
       toast.success("Welcome back. Your dashboard is ready.", "Login successful");
       navigate("/dashboard", { replace: true });
-    } catch (e) {
+    } catch {
       toast.error("Email or password is not valid.", "Login failed");
     }
   };

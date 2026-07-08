@@ -39,10 +39,12 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
 
   const showToast = useCallback(
     (message: string, type: ToastType = "success", title?: string) => {
+      // Keep ids browser-safe even if randomUUID is unavailable.
       const id =
         window.crypto?.randomUUID?.() ||
         `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+      // Limit the stack so repeated API errors do not cover the interface.
       setToasts((currentToasts) =>
         [
           ...currentToasts,

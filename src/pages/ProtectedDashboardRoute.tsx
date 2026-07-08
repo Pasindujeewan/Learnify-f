@@ -20,6 +20,7 @@ export function ProtectedDashboard() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   useEffect(() => {
+    // The dashboard is role-based, so verify the cookie session before rendering either view.
     const checkUser = async () => {
       const data = await verifyUser();
       if (!data) {

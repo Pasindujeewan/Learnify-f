@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,12 +15,15 @@ import {
   BookMarked,
   Award,
   Loader2,
-  Moon,
-  Sun,
 } from "lucide-react";
 import type { FullCourseType } from "../types/courseType";
 import { getFullCourse } from "../api/instructorServices/getFullCourse";
 import { useToast } from "../hook/toastHook";
+import {
+  addLesson,
+  getInstructorCourseLessons,
+} from "../api/lessonService";
+import type { Lesson } from "../types/lessonType";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -81,8 +85,12 @@ export const FullCourseDetailsPage = () => {
   const [course, setCourse] = useState<FullCourseType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dark, setDark] = useState(false);
   const toast = useToast();
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [lessonTitle, setLessonTitle] = useState("");
+  const [lessonContent, setLessonContent] = useState("");
+  const [lessonMinutes, setLessonMinutes] = useState(8);
+  const [isAddingLesson, setIsAddingLesson] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -94,6 +102,9 @@ export const FullCourseDetailsPage = () => {
           throw new Error("Course not found");
         }
         setCourse(data);
+        // Lessons are managed separately from course metadata while dummy data is used.
+        const lessonData = await getInstructorCourseLessons(id);
+        setLessons(lessonData);
       } catch {
         setError("Failed to load course");
         toast.error("Instructor course details could not be loaded.", "Course loading failed");
@@ -103,11 +114,6 @@ export const FullCourseDetailsPage = () => {
     };
     loadCourse();
   }, [id, toast]);
-
-  // Sync dark class on root — or wire to your app-level theme context
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-  }, [dark]);
 
   if (loading)
     return (
@@ -136,6 +142,38 @@ export const FullCourseDetailsPage = () => {
   const rating = toNumber(course.rating);
   const duration = toNumber(course.duration);
   const price = toNumber(course.price);
+  const totalLessonMinutes = lessons.reduce(
+    (sum, lesson) => sum + toNumber(lesson.estimatedMinutes),
+    0,
+  );
+
+  const handleAddLesson = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!id || !lessonTitle.trim() || !lessonContent.trim()) {
+      toast.error("Lesson title and content are required.", "Missing lesson details");
+      return;
+    }
+
+    try {
+      setIsAddingLesson(true);
+      // The new lesson appears immediately because the backend returns the created item.
+      const lesson = await addLesson(id, {
+        title: lessonTitle.trim(),
+        content: lessonContent.trim(),
+        estimatedMinutes: lessonMinutes,
+      });
+      setLessons((currentLessons) => [...currentLessons, lesson]);
+      setLessonTitle("");
+      setLessonContent("");
+      setLessonMinutes(8);
+      toast.success("Lesson added to this course.", "Lesson created");
+    } catch {
+      toast.error("Lesson could not be added. Please try again.", "Lesson creation failed");
+    } finally {
+      setIsAddingLesson(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
@@ -360,10 +398,101 @@ export const FullCourseDetailsPage = () => {
               </motion.div>
             )}
           </motion.div>
-          {/** Video lession Section  */}
-          <div>
-            
-          </div>
+          <motion.div
+            variants={fadeUp}
+            custom={4}
+            className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-50">
+                  Course lessons
+                </h2>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {lessons.length} lessons / {totalLessonMinutes} estimated minutes
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_360px]">
+              <div className="space-y-3">
+                {lessons.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-gray-200 p-8 text-center text-sm text-gray-500 dark:border-gray-800">
+                    No lessons added yet.
+                  </div>
+                ) : (
+                  lessons.map((lesson) => (
+                    <div
+                      key={lesson.lesson_id}
+                      className="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider text-violet-600">
+                            Lesson {lesson.order}
+                          </p>
+                          <h3 className="mt-1 text-sm font-bold text-gray-900 dark:text-white">
+                            {lesson.title}
+                          </h3>
+                        </div>
+                        <span className="rounded-full bg-white px-2 py-1 text-xs text-gray-500 dark:bg-gray-900">
+                          {lesson.estimatedMinutes} min
+                        </span>
+                      </div>
+                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-500 dark:text-gray-400">
+                        {lesson.content}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <form
+                onSubmit={handleAddLesson}
+                className="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950"
+              >
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                  Add lesson
+                </h3>
+                <label className="mt-4 block text-xs font-medium text-gray-500">
+                  Lesson title
+                </label>
+                <input
+                  value={lessonTitle}
+                  onChange={(event) => setLessonTitle(event.target.value)}
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 dark:border-gray-800 dark:bg-gray-900"
+                  placeholder="e.g. Understanding the basics"
+                />
+                <label className="mt-3 block text-xs font-medium text-gray-500">
+                  Lesson content
+                </label>
+                <textarea
+                  value={lessonContent}
+                  onChange={(event) => setLessonContent(event.target.value)}
+                  rows={7}
+                  className="mt-1 w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 dark:border-gray-800 dark:bg-gray-900"
+                  placeholder="Write the lesson text students will scroll and read..."
+                />
+                <label className="mt-3 block text-xs font-medium text-gray-500">
+                  Estimated minutes
+                </label>
+                <input
+                  value={lessonMinutes}
+                  onChange={(event) => setLessonMinutes(Number(event.target.value))}
+                  type="number"
+                  min={1}
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 dark:border-gray-800 dark:bg-gray-900"
+                />
+                <button
+                  type="submit"
+                  disabled={isAddingLesson}
+                  className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  {isAddingLesson ? "Adding..." : "Add lesson"}
+                </button>
+              </form>
+            </div>
+          </motion.div>
         </motion.div>
       </AnimatePresence>
     </div>

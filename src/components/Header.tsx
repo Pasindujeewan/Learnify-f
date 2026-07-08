@@ -65,15 +65,17 @@ export function HeaderDesktop() {
   const toast = useToast();
 
   try {
+    // Session storage keeps the header responsive between /user/me checks.
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       user = JSON.parse(storedUser);
     }
-  } catch (error) {
+  } catch {
     sessionStorage.removeItem("user");
   }
 
   const handleLogout = async () => {
+    // Clear both server cookie and local cached identity for a clean sign-out.
     await logoutUser().catch(() => undefined);
     sessionStorage.removeItem("user");
     toast.info("You have been signed out.", "Logged out");

@@ -6,6 +6,7 @@ export async function rateCourse({
   comment,
   courseId,
 }: CourseRatingType) {
+  // A student keeps one rating per course; the backend updates the previous one.
   return apiRequest("/students/rate-course", {
     method: "POST",
     body: JSON.stringify({ rating, comment, courseId }),

@@ -8,6 +8,7 @@ export type CourseCardProps = {
 };
 
 function toNumber(value: unknown, fallback = 0) {
+  // Postgres numeric values can arrive as strings, so cards normalize before formatting.
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
@@ -22,11 +23,12 @@ export default function CourseCard({ course }: CourseCardProps) {
     user = sessionStorage.getItem("user")
       ? JSON.parse(sessionStorage.getItem("user") || "null")
       : null;
-  } catch (error) {
+  } catch {
     sessionStorage.removeItem("user");
   }
 
   function handleCardClick() {
+    // Instructors manage the course; students and guests view the enrollment page.
     if (user?.role === "instructor") {
       navigate(`/instructor/courses/${course.course_id}`);
       return;

@@ -10,14 +10,8 @@ export const ThemeProvider = ({ children }: Props) => {
   useEffect(() => {
     const html = document.documentElement;
 
-    if (html.classList.contains("dark")) {
-      html.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      html.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-
+    // Keep Tailwind's dark class and localStorage aligned with the selected theme.
+    html.classList.toggle("dark", theme === "dark");
     localStorage.setItem("theme", theme);
   }, [theme]);
 

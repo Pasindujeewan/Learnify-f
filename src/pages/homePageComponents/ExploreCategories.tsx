@@ -85,6 +85,7 @@ export function ExploreCategories() {
         {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {categories.map((cat) => (
+            // Category cards currently point to future category pages.
             <div
               key={cat.id}
               onClick={() => navigate(cat.route)}
@@ -112,7 +113,7 @@ export function ExploreCategories() {
                 className={`flex items-center gap-1 text-xs font-semibold mt-auto ${cat.countColor}`}
               >
                 <span>{cat.courseCount}</span>
-                <span className="text-base">→</span>
+                <span className="text-base">-&gt;</span>
               </div>
             </div>
           ))}

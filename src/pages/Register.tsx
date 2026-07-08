@@ -30,20 +30,30 @@ export default function Register() {
     setIsLoading(true);
     let imageUrl = "";
     try {
+      // Avatar upload is optional, so account creation can continue if Cloudinary fails.
       if (data.avatar?.[0]) {
         imageUrl = await uploadImage(data.avatar[0]);
       }
-    } catch (error) {
+    } catch {
       toast.info("Image upload failed. Continuing without a profile photo.", "Photo skipped");
     }
 
-    const { avatar, ...rest } = data;
-    const userData: UserDbType = { ...rest, avatar: imageUrl };
+    const userData: UserDbType = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      role: data.role,
+      bio: data.bio,
+      description: data.description,
+      contact: data.contact,
+      avatar: imageUrl,
+    };
     try {
+      // The role selected in the form tells the API which profile table to initialize.
       await registerUser(userData);
       toast.success("Your account was created successfully.", "Registration complete");
       navigate("/dashboard");
-    } catch (error) {
+    } catch {
       toast.error("Please check your details and try again.", "Registration failed");
     } finally {
       setIsLoading(false);
@@ -262,6 +272,7 @@ export default function Register() {
                   <button
                     type="button"
                     onClick={async () => {
+                      // Validate the required first step before moving to profile details.
                       const valid = await trigger([
                         "name",
                         "email",
@@ -283,7 +294,7 @@ export default function Register() {
                         "0 4px 14px rgba(34,197,94,0.35)")
                     }
                   >
-                    Continue →
+                    Continue
                   </button>
                 </motion.div>
               )}
@@ -344,7 +355,7 @@ export default function Register() {
                       onClick={() => setSection(1)}
                       className="flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] text-[#64748b] dark:text-slate-400"
                     >
-                      ← Back
+                      Back
                     </button>
                     <button
                       type="button"
@@ -355,7 +366,7 @@ export default function Register() {
                         boxShadow: "0 4px 14px rgba(34,197,94,0.35)",
                       }}
                     >
-                      Next →
+                      Next
                     </button>
                   </div>
                 </motion.div>
@@ -432,7 +443,7 @@ export default function Register() {
                       onClick={() => setSection(2)}
                       className="flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[0.98] text-[#64748b] dark:text-slate-400"
                     >
-                      ← Back
+                      Back
                     </button>
                     <button
                       type="submit"
@@ -442,7 +453,7 @@ export default function Register() {
                         boxShadow: "0 4px 14px rgba(34,197,94,0.35)",
                       }}
                     >
-                      Create Account ✓
+                      Create Account
                     </button>
                   </div>
                 </motion.div>

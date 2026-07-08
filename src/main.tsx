@@ -9,6 +9,7 @@ import { ThemeProvider } from "./context/ThemeContextProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    {/* Theme, Redux, and toast providers are app-wide concerns. */}
     <ThemeProvider>
       <Provider store={store}>
         <ToastProvider>

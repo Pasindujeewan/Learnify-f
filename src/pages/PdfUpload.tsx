@@ -21,6 +21,7 @@ const UploadPDF = () => {
     }
 
     const formData = new FormData();
+    // The backend multer route expects the PDF under the "pdf" field name.
     formData.append("pdf", file);
 
     setError("");
@@ -34,13 +35,14 @@ const UploadPDF = () => {
 
       const data = await res.json();
 
+      // API errors still return JSON, so surface the backend message when present.
       if (!res.ok) {
         throw new Error(data.message || "Upload failed");
       }
 
       setResult(data.data);
       toast.success("PDF text and reading estimate are ready.", "PDF analyzed");
-    } catch (error) {
+    } catch {
       setError("Could not read this PDF. Please try another file.");
       toast.error("Could not read this PDF. Please try another file.", "PDF analysis failed");
     } finally {

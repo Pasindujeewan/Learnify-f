@@ -6,6 +6,7 @@ export async function verifyUser(): Promise<
   StudentProfileType | instructorProfileType | null
 > {
   try {
+    // /user/me verifies the HTTP-only auth cookie and returns the correct role profile.
     const data = await apiRequest<{
       success: boolean;
       user: StudentProfileType | instructorProfileType;
@@ -14,6 +15,7 @@ export async function verifyUser(): Promise<
     sessionStorage.setItem("user", JSON.stringify(data.user));
     return data.user;
   } catch (e) {
+    console.log(e);
     sessionStorage.removeItem("user");
     return null;
   }
