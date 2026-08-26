@@ -98,19 +98,28 @@ export default function CourseDetailsPage() {
   }, [course?.course_id, toast]);
 
   const handleOnclick = async () => {
-    const courseId = course.course_id;
+    const courseId = course?.course_id;
     if (!courseId) {
-      toast.error("This course cannot be enrolled right now.", "Course unavailable");
+      toast.error(
+        "This course cannot be enrolled right now.",
+        "Course unavailable",
+      );
       return;
     }
 
     try {
       // Enrollment returns the student to the dedicated lesson player with progress tracking.
       await enrollToCourse(courseId);
-      toast.success("The course was added to your dashboard.", "Enrollment saved");
+      toast.success(
+        "The course was added to your dashboard.",
+        "Enrollment saved",
+      );
       navigate(`/courses/${courseId}/learn`);
     } catch {
-      toast.error("Please login as a student and try again.", "Enrollment failed");
+      toast.error(
+        "Please login as a student and try again.",
+        "Enrollment failed",
+      );
     }
   };
 
@@ -372,7 +381,8 @@ export default function CourseDetailsPage() {
                   Lesson outline
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Enroll to open the dedicated lesson page with progress tracking.
+                  Enroll to open the dedicated lesson page with progress
+                  tracking.
                 </p>
               </div>
               <button

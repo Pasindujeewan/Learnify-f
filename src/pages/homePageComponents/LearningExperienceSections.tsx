@@ -49,7 +49,7 @@ const testimonials = [
       "The course flow feels simple. I can browse, enroll, and continue learning without losing my place.",
   },
   {
-    name: "Ravindu Silva",
+    name: "Visal Silva",
     role: "Instructor",
     quote:
       "Creating courses and checking enrolled students from one dashboard makes teaching much easier.",
@@ -83,8 +83,14 @@ export function LearningExperienceSections() {
             </p>
             <div className="mt-6 grid gap-3">
               {outcomes.map((item) => (
-                <div key={item} className="flex gap-3 text-sm text-slate-700 dark:text-slate-300">
-                  <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-600" size={18} />
+                <div
+                  key={item}
+                  className="flex gap-3 text-sm text-slate-700 dark:text-slate-300"
+                >
+                  <CheckCircle2
+                    className="mt-0.5 shrink-0 text-emerald-600"
+                    size={18}
+                  />
                   <span>{item}</span>
                 </div>
               ))}
@@ -119,8 +125,16 @@ export function LearningExperienceSections() {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              { label: "Students supported", value: "2M+", icon: GraduationCap },
-              { label: "Verified instructors", value: "500+", icon: UserRoundCheck },
+              {
+                label: "Students supported",
+                value: "2M+",
+                icon: GraduationCap,
+              },
+              {
+                label: "Verified instructors",
+                value: "500+",
+                icon: UserRoundCheck,
+              },
               { label: "Skill certificates", value: "35K+", icon: Award },
             ].map((stat) => (
               <div
@@ -177,8 +191,8 @@ export function LearningExperienceSections() {
               Build your next skill path with Learnify
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">
-              Join as a student to learn, or register as an instructor to publish
-              courses and manage learners.
+              Join as a student to learn, or register as an instructor to
+              publish courses and manage learners.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">

@@ -38,7 +38,8 @@ export function CourseRateToggle({ isOpen, onClose, courseId }: Props) {
         "Review submitted",
       );
       onClose(false);
-    } catch {
+    } catch (error) {
+      console.error("Failed to submit course review", error);
       toast.error("Please login as a student and try again.", "Review failed");
     }
   };
