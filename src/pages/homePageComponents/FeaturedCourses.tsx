@@ -29,10 +29,13 @@ export function FeaturedCourses() {
     async function loadFeaturedCourses() {
       try {
         const courses = await getCourses(6);
-        setFeaturedCourses(courses);
+        setFeaturedCourses(courses.items);
       } catch {
         setFeaturedCourses([]);
-        toast.error("Featured courses could not be loaded.", "Courses unavailable");
+        toast.error(
+          "Featured courses could not be loaded.",
+          "Courses unavailable",
+        );
       }
     }
 
@@ -57,8 +60,8 @@ export function FeaturedCourses() {
               Popular courses to start with
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-400">
-              Browse practical courses designed for skill growth, portfolio work,
-              and guided progress from beginner to advanced levels.
+              Browse practical courses designed for skill growth, portfolio
+              work, and guided progress from beginner to advanced levels.
             </p>
           </div>
           <button

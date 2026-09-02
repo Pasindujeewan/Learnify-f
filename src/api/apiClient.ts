@@ -1,10 +1,14 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 type ApiOptions = RequestInit & {
   auth?: boolean;
 };
 
-export async function apiRequest<T>(path: string, options: ApiOptions = {}): Promise<T> {
+export async function apiRequest<T>(
+  path: string,
+  options: ApiOptions = {},
+): Promise<T> {
   // Centralizes API base URL, JSON headers, cookies, and error parsing.
   const response = await fetch(`${API_BASE_URL}${path}`, {
     credentials: options.auth === false ? "same-origin" : "include",
@@ -27,7 +31,14 @@ export async function apiRequest<T>(path: string, options: ApiOptions = {}): Pro
 
 export type ApiListResponse<T> = {
   success: boolean;
-  data: T[];
+  data: {
+    items: T[];
+    pagination?: {
+      page: number;
+      limit: number;
+      hasMore: boolean;
+    };
+  };
 };
 
 export type ApiItemResponse<T> = {

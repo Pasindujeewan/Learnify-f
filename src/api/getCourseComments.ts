@@ -9,7 +9,7 @@ export async function getCourseComments(courseId: string): Promise<comments[]> {
       { auth: false },
     );
 
-    return data.data;
+    return data.data.items;
   } catch {
     return [];
   }

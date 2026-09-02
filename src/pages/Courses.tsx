@@ -17,7 +17,7 @@ const filters = [
   },
   {
     name: "Category",
-    options: ["Programming", "Design", "Marketing", "Business"],
+    options: ["Programimng", "Design", "Marketing", "Business"],
   },
   {
     name: "Language",
@@ -66,16 +66,21 @@ export function Courses() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const courses = await getCourses(48);
-        setCourses(courses);
+        const res = await getCourses(48, search, activeFilter, 1);
+        console.log("Fetched courses:", res);
+        setCourses(res.items);
       } catch {
+        console.error("Failed to fetch courses");
         setError("Unable to load courses right now.");
-        toast.error("Unable to load courses right now.", "Course loading failed");
+        toast.error(
+          "Unable to load courses right now.",
+          "Course loading failed",
+        );
         setCourses([]);
       }
     };
     fetchCourses();
-  }, [toast]);
+  }, [activeFilter, search, sortOption, toast]);
 
   useEffect(() => {
     const updateViewport = () => setIsMobile(window.innerWidth < 768);
@@ -100,42 +105,6 @@ export function Courses() {
       prev.includes(value) ? prev.filter((f) => f !== value) : [...prev, value],
     );
   };
-
-  const visibleCourses = useMemo(() => {
-    if (!courses) return [];
-    let result = [...courses];
-
-    // Filtering and sorting are kept client-side while the API returns the course catalog.
-    const normalizedSearch = search.trim().toLowerCase();
-    if (normalizedSearch) {
-      result = result.filter((course) =>
-        [course.title, course.description, course.category, course.instructorName]
-          .filter(Boolean)
-          .some((value) => value.toLowerCase().includes(normalizedSearch)),
-      );
-    }
-
-    if (activeFilter.length > 0) {
-      result = result.filter(
-        (c) =>
-          activeFilter.includes(c.level) ||
-          activeFilter.includes(c.category) ||
-          activeFilter.includes(c.language) ||
-          (activeFilter.includes("Free") && toNumber(c.price) === 0) ||
-          (activeFilter.includes("Paid") && toNumber(c.price) > 0),
-      );
-    }
-
-    if (sortOption === "Popular") {
-      result.sort((a, b) => toNumber(b.rating) - toNumber(a.rating));
-    } else if (sortOption === "Newest") {
-      result.sort((a, b) => Number(b.course_id) - Number(a.course_id));
-    } else if (sortOption === "Highest Rated") {
-      result.sort((a, b) => toNumber(b.rating) - toNumber(a.rating));
-    }
-
-    return result;
-  }, [courses, activeFilter, search, sortOption]);
 
   return (
     <div className="flex relative  md:px-10 px-2 gap-2 py-5 dark:bg-slate-700">
@@ -268,15 +237,16 @@ export function Courses() {
             </p>
           )}
 
-          {courses && visibleCourses.length === 0 && !error && (
+          {courses && courses.length === 0 && !error && (
             <p className="col-span-full rounded-lg border border-dashed border-slate-300 px-4 py-10 text-center text-sm text-slate-500">
               No courses match your current filters.
             </p>
           )}
 
-          {visibleCourses.map((course) => (
-            <CourseCard key={course.course_id} course={course} />
-          ))}
+          {courses &&
+            courses.map((course) => (
+              <CourseCard key={course.course_id} course={course} />
+            ))}
         </div>
       </div>
     </div>

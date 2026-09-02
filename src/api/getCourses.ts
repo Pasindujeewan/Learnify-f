@@ -5,10 +5,15 @@ import {
 } from "./apiClient";
 import type { Course } from "../types/courseType";
 
-export async function getCourses(limit: number = 10) {
+export async function getCourses(
+  limit: number = 10,
+  search: string = "",
+  categories: string[] = [],
+  page: number = 1,
+) {
   // Course catalog endpoints are public so guests can browse before logging in.
   const data = await apiRequest<ApiListResponse<Course>>(
-    `/courses?limit=${limit}`,
+    `/courses/getAll?limit=${limit}&search=${search}&categories=${categories.join(",")}&page=${page}`,
     {
       auth: false,
     },
