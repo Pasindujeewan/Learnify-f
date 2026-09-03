@@ -10,10 +10,11 @@ export async function getCourses(
   search: string = "",
   categories: string[] = [],
   page: number = 1,
+  sort: string = "createdAt",
 ) {
   // Course catalog endpoints are public so guests can browse before logging in.
   const data = await apiRequest<ApiListResponse<Course>>(
-    `/courses/getAll?limit=${limit}&search=${search}&categories=${categories.join(",")}&page=${page}`,
+    `/courses/getAll?limit=${limit}&search=${search}&categories=${categories.join(",")}&page=${page}&sort=${sort}`,
     {
       auth: false,
     },

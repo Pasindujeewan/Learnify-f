@@ -66,7 +66,7 @@ export function Courses() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await getCourses(48, search, activeFilter, 1);
+        const res = await getCourses(48, search, activeFilter, 1, sortOption);
         console.log("Fetched courses:", res);
         setCourses(res.items);
       } catch {
@@ -216,9 +216,12 @@ export function Courses() {
             onChange={(e) => setSortOption(e.target.value)}
           >
             <option value="">Sort</option>
-            <option value="Popular">Popular</option>
-            <option value="Newest">Newest</option>
-            <option value="Highest Rated">Highest Rated</option>
+            <option value="popular">Popular</option>
+            <option value="newest">Newest</option>
+            <option value="price low to high">Price: Low to High</option>
+            <option value="price high to low">Price: High to Low</option>
+            <option value="highestRated">Highest Rated</option>
+            <option value="oldest">Oldest</option>
           </select>
         </div>
 
