@@ -50,6 +50,9 @@ export function Courses() {
     "Duration",
     "Price",
   ]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   const [activeFilter, setActiveFilter] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState("");
   const [courses, setCourses] = useState<Course[] | null>(null);
@@ -59,8 +62,11 @@ export function Courses() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await getCourses(48, search, activeFilter, 1, sortOption);
-        setCourses(res.items);
+        const res = await getCourses(2, search, activeFilter, page, sortOption);
+        setCourses((prev) =>
+          page === 1 ? res.items : [...(prev || []), ...res.items],
+        );
+        setHasMore(res.pagination ? res.pagination.hasMore : false);
       } catch {
         toast.error(
           "Unable to load courses right now.",
@@ -70,7 +76,7 @@ export function Courses() {
       }
     };
     fetchCourses();
-  }, [activeFilter, search, sortOption, toast]);
+  }, [activeFilter, search, sortOption, toast, page]);
 
   useEffect(() => {
     const updateViewport = () => setIsMobile(window.innerWidth < 768);
@@ -234,6 +240,16 @@ export function Courses() {
             courses.map((course) => (
               <CourseCard key={course.course_id} course={course} />
             ))}
+          {courses && hasMore && (
+            <button
+              onClick={() => setPage((prev) => prev + 1)}
+              className="col-span-full py-2.5 px-4 rounded-lg border border-gray-200 dark:border-slate-700
+                text-sm text-gray-700 dark:text-slate-200 bg-gray-50 dark:bg-slate-800
+                hover:bg-gray-100 dark:hover:bg-slate-600 transition"
+            >
+              Load More
+            </button>
+          )}
         </div>
       </div>
     </div>
