@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FiChevronRight } from "react-icons/fi";
 import { FiChevronLeft, FiChevronDown, FiChevronUp } from "react-icons/fi";
@@ -38,12 +38,6 @@ const filters = [
   },
 ];
 
-function toNumber(value: unknown, fallback = 0) {
-  // Course price/rating values can be strings after JSON serialization.
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
-}
-
 export function Courses() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("search");
@@ -59,7 +53,6 @@ export function Courses() {
   const [activeFilter, setActiveFilter] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState("");
   const [courses, setCourses] = useState<Course[] | null>(null);
-  const [error, setError] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const toast = useToast();
 
@@ -67,11 +60,8 @@ export function Courses() {
     const fetchCourses = async () => {
       try {
         const res = await getCourses(48, search, activeFilter, 1, sortOption);
-        console.log("Fetched courses:", res);
         setCourses(res.items);
       } catch {
-        console.error("Failed to fetch courses");
-        setError("Unable to load courses right now.");
         toast.error(
           "Unable to load courses right now.",
           "Course loading failed",
@@ -234,13 +224,7 @@ export function Courses() {
             </p>
           )}
 
-          {error && (
-            <p className="col-span-full rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
-            </p>
-          )}
-
-          {courses && courses.length === 0 && !error && (
+          {courses && courses.length === 0 && (
             <p className="col-span-full rounded-lg border border-dashed border-slate-300 px-4 py-10 text-center text-sm text-slate-500">
               No courses match your current filters.
             </p>
