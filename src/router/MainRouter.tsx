@@ -11,6 +11,7 @@ import { AboutUs } from "../pages/AboutUs";
 import UploadPDF from "../pages/PdfUpload";
 import { RouteErrorFallback } from "../components/RouteErrorFallback";
 import { LessonLearningPage } from "../pages/LessonLearningPage";
+import CreateLesson from "../pages/instructurDashboardComponents/CreateLesson";
 
 export function MainRouter() {
   // Route-level fallbacks prevent render errors from showing React Router's default crash page.
@@ -39,6 +40,10 @@ export function MainRouter() {
         {
           path: "instructor/courses/:id",
           element: <FullCourseDetailsPage />,
+        },
+        {
+          path: "instructor/courses/:id/lessons/create",
+          element: <CreateLesson />,
         },
         {
           path: "aboutus",

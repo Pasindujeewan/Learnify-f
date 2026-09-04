@@ -19,11 +19,9 @@ import {
 import type { FullCourseType } from "../types/courseType";
 import { getFullCourse } from "../api/instructorServices/getFullCourse";
 import { useToast } from "../hook/toastHook";
-import {
-  addLesson,
-  getInstructorCourseLessons,
-} from "../api/lessonService";
+import { addLesson, getInstructorCourseLessons } from "../api/lessonService";
 import type { Lesson } from "../types/lessonType";
+import { useNavigate } from "react-router-dom";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -92,6 +90,8 @@ export const FullCourseDetailsPage = () => {
   const [lessonMinutes, setLessonMinutes] = useState(8);
   const [isAddingLesson, setIsAddingLesson] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!id) return;
     const loadCourse = async () => {
@@ -107,7 +107,10 @@ export const FullCourseDetailsPage = () => {
         setLessons(lessonData);
       } catch {
         setError("Failed to load course");
-        toast.error("Instructor course details could not be loaded.", "Course loading failed");
+        toast.error(
+          "Instructor course details could not be loaded.",
+          "Course loading failed",
+        );
       } finally {
         setLoading(false);
       }
@@ -151,7 +154,10 @@ export const FullCourseDetailsPage = () => {
     event.preventDefault();
 
     if (!id || !lessonTitle.trim() || !lessonContent.trim()) {
-      toast.error("Lesson title and content are required.", "Missing lesson details");
+      toast.error(
+        "Lesson title and content are required.",
+        "Missing lesson details",
+      );
       return;
     }
 
@@ -169,7 +175,10 @@ export const FullCourseDetailsPage = () => {
       setLessonMinutes(8);
       toast.success("Lesson added to this course.", "Lesson created");
     } catch {
-      toast.error("Lesson could not be added. Please try again.", "Lesson creation failed");
+      toast.error(
+        "Lesson could not be added. Please try again.",
+        "Lesson creation failed",
+      );
     } finally {
       setIsAddingLesson(false);
     }
@@ -184,14 +193,12 @@ export const FullCourseDetailsPage = () => {
           animate="visible"
           variants={staggerContainer}
         >
-          {/* ── Course Header ── */}
           <motion.div
             variants={fadeUp}
             custom={0}
             className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm"
           >
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-              {/* Thumbnail */}
               <div className="relative flex-shrink-0 self-start">
                 <img
                   src={course.imageUrl}
@@ -203,7 +210,6 @@ export const FullCourseDetailsPage = () => {
                 </span>
               </div>
 
-              {/* Meta */}
               <div className="flex-1 space-y-3">
                 <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-50 leading-snug">
                   {course.title}
@@ -212,7 +218,6 @@ export const FullCourseDetailsPage = () => {
                   {course.description}
                 </p>
 
-                {/* Badges */}
                 <div className="flex gap-2 flex-wrap">
                   <span className="inline-flex items-center gap-1.5 bg-violet-50 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 text-xs font-medium px-2.5 py-1 rounded-full">
                     <Tag className="w-3 h-3" /> {course.category}
@@ -225,7 +230,6 @@ export const FullCourseDetailsPage = () => {
                   </span>
                 </div>
 
-                {/* Rating + Price */}
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4 bg-gray-50 dark:bg-gray-800/60 rounded-xl px-3 sm:px-4 py-2.5">
                   <div className="flex items-center gap-1.5">
                     <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -249,9 +253,7 @@ export const FullCourseDetailsPage = () => {
             </div>
           </motion.div>
 
-          {/* ── Info + Stats Row ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-            {/* Course Info */}
             <motion.div
               variants={fadeUp}
               custom={1}
@@ -289,7 +291,6 @@ export const FullCourseDetailsPage = () => {
               </ul>
             </motion.div>
 
-            {/* Stats Grid */}
             <motion.div
               variants={fadeUp}
               custom={2}
@@ -331,7 +332,6 @@ export const FullCourseDetailsPage = () => {
             </motion.div>
           </div>
 
-          {/* ── Enrolled Students ── */}
           <motion.div
             variants={fadeUp}
             custom={3}
@@ -409,7 +409,8 @@ export const FullCourseDetailsPage = () => {
                   Course lessons
                 </h2>
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {lessons.length} lessons / {totalLessonMinutes} estimated minutes
+                  {lessons.length} lessons / {totalLessonMinutes} estimated
+                  minutes
                 </p>
               </div>
             </div>
@@ -478,7 +479,9 @@ export const FullCourseDetailsPage = () => {
                 </label>
                 <input
                   value={lessonMinutes}
-                  onChange={(event) => setLessonMinutes(Number(event.target.value))}
+                  onChange={(event) =>
+                    setLessonMinutes(Number(event.target.value))
+                  }
                   type="number"
                   min={1}
                   className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 dark:border-gray-800 dark:bg-gray-900"
@@ -491,6 +494,12 @@ export const FullCourseDetailsPage = () => {
                   {isAddingLesson ? "Adding..." : "Add lesson"}
                 </button>
               </form>
+              <button
+                onClick={() => navigate("./lessons/create")}
+                className="mt-4 w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
+              >
+                test editor
+              </button>
             </div>
           </motion.div>
         </motion.div>
