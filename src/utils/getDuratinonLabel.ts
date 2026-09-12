@@ -1,1 +1,0 @@
-export { getDurationLabel } from "./getDurationLabel";

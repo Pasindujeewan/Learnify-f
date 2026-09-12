@@ -1,8 +1,12 @@
-export function initials(name: string) {
+/**
+ * Returns the uppercase initials from a full name.
+ * e.g. "John Doe" → "JD", "Alice" → "A"
+ */
+export function getInitials(name: string): string {
+  if (!name) return "";
   return name
     .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+    .filter(Boolean)
+    .map((part) => part[0].toUpperCase())
+    .join("");
 }
