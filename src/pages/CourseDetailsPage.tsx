@@ -1,461 +1,143 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { enrollToCourse } from "../api/studentService/enrollToCourse";
-import {
-  FaStar,
-  FaClock,
-  FaUser,
-  FaTag,
-  FaGlobe,
-  FaSun,
-  FaMoon,
-  FaPlayCircle,
-} from "react-icons/fa";
-import type { Course } from "../types/courseType";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { CourseRateToggle } from "../components/StudentComponets/CourseRateToggle";
-import type { comments } from "../types/comments";
-import { getCourseComments } from "../api/getCourseComments";
-import { Comments } from "../components/Comments";
-import { getCourse } from "../api/getCourses";
-import { useToast } from "../hook/toastHook";
-import { getPublicCourseLessons } from "../api/lessonService";
-import type { Lesson } from "../types/lessonType";
-
-const levelColors: Record<string, { bg: string; text: string }> = {
-  Beginner: {
-    bg: "bg-emerald-100 dark:bg-emerald-900/40",
-    text: "text-emerald-700 dark:text-emerald-300",
-  },
-  Intermediate: {
-    bg: "bg-amber-100 dark:bg-amber-900/40",
-    text: "text-amber-700 dark:text-amber-300",
-  },
-  Advanced: {
-    bg: "bg-rose-100 dark:bg-rose-900/40",
-    text: "text-rose-700 dark:text-rose-300",
-  },
-};
-
-function toNumber(value: unknown, fallback = 0) {
-  // Database numeric fields may be serialized as strings by the API.
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
-}
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import type { Course, Lesson, Comment } from "../types";
+import { getCourse, getCourseComments, enrollToCourse } from "../services/courseService";
+import { getPublicCourseLessons } from "../services/lessonService";
+import { useToast } from "../hooks/useToast";
+import { CourseDetailHero } from "../features/courses/CourseDetailHero";
+import { CoursePricingCard } from "../features/courses/CoursePricingCard";
+import { CourseContentTabs } from "../features/courses/CourseContentTabs";
+import { CourseRateModal } from "../features/courses/CourseRateModal";
 
 export default function CourseDetailsPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const toast = useToast();
+
   const [course, setCourse] = useState<Course | null>(
     (location.state as Course) || null,
   );
-  const [dark, setDark] = useState(false);
-  const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [comments, setComments] = useState<comments[] | null>(null);
+  const [comments, setComments] = useState<Comment[] | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(!course);
 
   useEffect(() => {
-    async function loadCourse() {
-      if (!course && id) {
-        try {
-          const data = await getCourse(id);
-          setCourse(data);
-        } catch {
-          toast.error("This course could not be loaded.", "Course unavailable");
+    if (!id) return;
+
+    async function loadData() {
+      try {
+        if (!course) {
+          setIsLoading(true);
+          const courseData = await getCourse(id!);
+          setCourse(courseData);
+        }
+
+        const [commentsData, lessonsData] = await Promise.all([
+          getCourseComments(id!),
+          getPublicCourseLessons(id!).catch(() => ({ items: [] })),
+        ]);
+
+        setComments(commentsData || []);
+        setLessons(lessonsData?.items || []);
+      } catch {
+        toast.error("Unable to load course details.", "Error");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+  }, [id, course, toast]);
+
+  // Check enrollment from session
+  useEffect(() => {
+    if (!course) return;
+    try {
+      const user = sessionStorage.getItem("user");
+      if (user) {
+        const parsed = JSON.parse(user);
+        if (parsed?.courses?.some((c: { course_id: string }) => c.course_id === course.course_id)) {
+          setIsEnrolled(true);
         }
       }
+    } catch {
+      // Ignore session read error
     }
+  }, [course]);
 
-    loadCourse();
-  }, [course, id, toast]);
-
-  useEffect(() => {
-    async function fetchComments() {
-      if (!course?.course_id) return;
-
-      const data = await getCourseComments(course.course_id);
-      setComments(data);
-    }
-    fetchComments();
-  }, [course?.course_id]);
-
-  useEffect(() => {
-    async function loadLessons() {
-      if (!course?.course_id) return;
-
-      try {
-        // Public lessons are an outline only; completion happens on the enrolled learn page.
-        const data = await getPublicCourseLessons(course.course_id);
-        setLessons(data);
-      } catch {
-        setLessons([]);
-      }
-    }
-
-    loadLessons();
-  }, [course?.course_id, toast]);
-
-  const handleOnclick = async () => {
-    const courseId = course?.course_id;
-    if (!courseId) {
-      toast.error(
-        "This course cannot be enrolled right now.",
-        "Course unavailable",
-      );
+  const handleEnroll = async () => {
+    if (!course) return;
+    const user = sessionStorage.getItem("user");
+    if (!user) {
+      toast.info("Please login to enroll in courses.", "Authentication required");
+      navigate("/login", { state: { returnTo: `/courses/${course.course_id}` } });
       return;
     }
 
     try {
-      // Enrollment returns the student to the dedicated lesson player with progress tracking.
-      await enrollToCourse(courseId);
-      toast.success(
-        "The course was added to your dashboard.",
-        "Enrollment saved",
-      );
-      navigate(`/courses/${courseId}/learn`);
+      setIsEnrolling(true);
+      await enrollToCourse(course.course_id);
+      setIsEnrolled(true);
+      toast.success("You are now enrolled in this course!", "Success");
+      navigate(`/courses/${course.course_id}/learn`);
     } catch {
-      toast.error(
-        "Please login as a student and try again.",
-        "Enrollment failed",
-      );
+      toast.error("Failed to complete enrollment. Please try again.", "Enrollment failed");
+    } finally {
+      setIsEnrolling(false);
     }
   };
 
-  if (!course) {
+  const refreshComments = async () => {
+    if (!id) return;
+    const freshComments = await getCourseComments(id);
+    setComments(freshComments);
+  };
+
+  if (isLoading || !course) {
     return (
-      <div className="min-h-screen px-4 py-16 text-center text-sm text-slate-500">
-        Loading course...
+      <div className="min-h-[60vh] flex items-center justify-center text-slate-400">
+        <p className="text-sm font-medium">Loading course information...</p>
       </div>
     );
   }
 
-  const levelStyle = levelColors[course.level] ?? {
-    bg: "bg-slate-100 dark:bg-slate-800",
-    text: "text-slate-600 dark:text-slate-300",
-  };
-  const rating = toNumber(course.rating);
-  const duration = toNumber(course.duration);
-  const price = toNumber(course.price);
-  const totalLessonMinutes = lessons.reduce(
-    (sum, lesson) => sum + toNumber(lesson.estimatedMinutes),
-    0,
-  );
-
   return (
-    <div className={dark ? "dark" : ""}>
-      {isReviewOpen && (
-        <CourseRateToggle
-          isOpen={isReviewOpen}
-          onClose={setIsReviewOpen}
-          courseId={course.course_id}
-        />
-      )}
-      <div className="min-h-screen bg-slate-50 dark:bg-[#0f1117] transition-colors duration-300 font-sans">
-        {/* Dark mode toggle */}
-        <div className="max-w-5xl mx-auto px-4 pt-5 flex justify-end">
-          <button
-            onClick={() => setDark(!dark)}
-            className="p-2.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all text-slate-500 dark:text-amber-300"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={dark ? "moon" : "sun"}
-                initial={{ rotate: -30, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 30, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="block"
-              >
-                {dark ? <FaMoon size={15} /> : <FaSun size={15} />}
-              </motion.span>
-            </AnimatePresence>
-          </button>
-        </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <CourseDetailHero course={course} />
 
-        <div className="max-w-5xl mx-auto px-4 pb-16 pt-4">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            {/* Hero Image Card */}
-            <div className="relative rounded-2xl overflow-hidden shadow-xl mb-8 group">
-              <img
-                src={course.imageUrl}
-                alt={course.title}
-                className="w-full h-[340px] object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-              {/* Floating info on image */}
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full ${levelStyle.bg} ${levelStyle.text}`}
-                  >
-                    {course.level}
-                  </span>
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-white/15 text-white backdrop-blur-sm flex items-center gap-1.5">
-                    <FaTag size={9} /> {course.category}
-                  </span>
-                </div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight drop-shadow">
-                  {course.title}
-                </h1>
-              </div>
-
-              {/* Play button */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="bg-white/20 backdrop-blur-md rounded-full p-4">
-                  <FaPlayCircle size={40} className="text-white" />
-                </div>
-              </div>
-            </div>
-
-            {/* Main content grid */}
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* LEFT: Description + instructor */}
-              <div className="md:col-span-2 space-y-6">
-                {/* Instructor */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-semibold text-sm shadow">
-                    {course.instructorName?.charAt(0) ?? "?"}
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      Instructor
-                    </p>
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      {course.instructorName}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div className="h-px bg-slate-200 dark:bg-slate-700/60" />
-
-                {/* Description */}
-                <div>
-                  <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
-                    About this course
-                  </h2>
-                  <p className="text-slate-600 dark:text-slate-300 text-[15px] leading-relaxed">
-                    {course.description}
-                  </p>
-                </div>
-
-                {/* Stats row */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    {
-                      icon: <FaClock size={13} />,
-                      label: "Duration",
-                      value: `${duration} hrs`,
-                    },
-                    {
-                      icon: <FaGlobe size={13} />,
-                      label: "Language",
-                      value: course.language,
-                    },
-                    {
-                      icon: <FaStar size={13} className="text-amber-400" />,
-                      label: "Rating",
-                      value: rating.toFixed(1),
-                    },
-                  ].map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="bg-white dark:bg-slate-800/70 rounded-xl border border-slate-100 dark:border-slate-700/50 p-3.5 flex flex-col gap-1.5 shadow-sm"
-                    >
-                      <div className="flex items-center gap-1.5 text-slate-400 dark:text-slate-500">
-                        {stat.icon}
-                        <span className="text-[11px] font-medium uppercase tracking-wider">
-                          {stat.label}
-                        </span>
-                      </div>
-                      <p className="text-slate-800 dark:text-slate-100 font-semibold text-sm">
-                        {stat.value}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* RIGHT: Enrollment card */}
-              <div className="md:col-span-1">
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15, duration: 0.45 }}
-                  className="sticky top-6 bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700/50 rounded-2xl shadow-sm p-6 space-y-5 backdrop-blur-sm"
-                >
-                  {/* Price */}
-                  <div>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">
-                      Price
-                    </p>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-slate-900 dark:text-white">
-                        {price > 0 ? `$${price.toFixed(2)}` : "Free"}
-                      </span>
-                      <span className="text-slate-400 text-sm dark:text-slate-500">
-                        USD
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Rating visual */}
-                  <div className="flex items-center gap-1.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <FaStar
-                        key={i}
-                        size={14}
-                        className={
-                          i < Math.round(rating)
-                            ? "text-amber-400"
-                            : "text-slate-200 dark:text-slate-600"
-                        }
-                      />
-                    ))}
-                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300 ml-1">
-                      {rating.toFixed(1)}
-                    </span>
-                  </div>
-
-                  <div className="h-px bg-slate-100 dark:bg-slate-700/60" />
-
-                  {/* Quick info */}
-                  <div className="space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
-                    <div className="flex items-center gap-2">
-                      <FaClock size={12} className="text-slate-400" />
-                      <span>{duration} hours of content</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaGlobe size={12} className="text-slate-400" />
-                      <span>{course.language}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaUser size={12} className="text-slate-400" />
-                      <span>{course.instructorName}</span>
-                    </div>
-                  </div>
-
-                  {/* CTA */}
-                  <div className="flex flex-col justify-center items-center gap-2 ">
-                    <motion.button
-                      onClick={handleOnclick}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 transition-colors text-sm tracking-wide"
-                    >
-                      Enroll and start lessons
-                    </motion.button>
-                    <p
-                      onClick={() => {
-                        setIsReviewOpen(true);
-                      }}
-                      className="text-[12px] text-yellow-500   cursor-pointer"
-                    >
-                      Rate this course
-                    </p>
-                  </div>
-
-                  <p className="text-center text-[11px] text-slate-400 dark:text-slate-500">
-                    30-day money-back guarantee
-                  </p>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-          <div className="h-px bg-slate-200 dark:bg-slate-700/60 mt-3" />
-          <section className="mt-8">
-            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
-                  Lessons
-                </p>
-                <h2 className="mt-1 text-xl font-bold text-slate-800 dark:text-slate-100">
-                  Lesson outline
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Enroll to open the dedicated lesson page with progress
-                  tracking.
-                </p>
-              </div>
-              <button
-                onClick={() => navigate(`/courses/${course.course_id}/learn`)}
-                className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900"
-              >
-                Start lessons
-              </button>
-            </div>
-
-            {lessons.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900">
-                No lessons have been added to this course yet.
-              </div>
-            ) : (
-              <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-                <div className="mb-4 flex items-center justify-between text-sm">
-                  <span className="font-semibold text-slate-800 dark:text-slate-100">
-                    {lessons.length} lessons
-                  </span>
-                  <span className="text-slate-500">
-                    {totalLessonMinutes} estimated minutes
-                  </span>
-                </div>
-                <div className="grid gap-3 md:grid-cols-2">
-                  {lessons.map((lesson) => (
-                    <div
-                      key={lesson.lesson_id}
-                      className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950"
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">
-                        Lesson {lesson.order}
-                      </p>
-                      <h3 className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
-                        {lesson.title}
-                      </h3>
-                      <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">
-                        {lesson.content}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </section>
-
-          <div className="h-px bg-slate-200 dark:bg-slate-700/60 mt-8" />
-          <div className="mt-8">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">
-              Comments
-            </h2>
-
-            <div className="space-y-4">
-              {!comments || comments.length === 0 ? (
-                <div className="text-center py-10 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    No reviews yet.
-                  </p>
-                </div>
-              ) : (
-                comments.map((comment) => (
-                  <div
-                    key={comment.commentId}
-                    className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition"
-                  >
-                    <Comments comment={comment} />
-                  </div>
-                ))
-              )}
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <CourseContentTabs
+              course={course}
+              lessons={lessons}
+              comments={comments}
+              onRefreshComments={refreshComments}
+            />
           </div>
+
+          <aside className="lg:col-span-1">
+            <CoursePricingCard
+              course={course}
+              isEnrolled={isEnrolled}
+              isEnrolling={isEnrolling}
+              onEnroll={handleEnroll}
+              onOpenReviewModal={() => setIsReviewOpen(true)}
+            />
+          </aside>
         </div>
       </div>
+
+      <CourseRateModal
+        isOpen={isReviewOpen}
+        onClose={setIsReviewOpen}
+        courseId={course.course_id}
+        onRatingSubmitted={refreshComments}
+      />
     </div>
   );
 }

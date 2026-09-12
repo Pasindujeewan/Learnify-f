@@ -1,1 +1,2 @@
-export { default } from "../instructurDashboardComponents/instructurAddCourse";
+export * from "../../features/dashboard/CreateCourseModal";
+export { default } from "../../features/dashboard/CreateCourseModal";
