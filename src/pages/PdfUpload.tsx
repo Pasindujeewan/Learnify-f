@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useToast } from "../hook/toastHook";
+import { useToast } from "../hooks/useToast";
 
 type PdfResult = {
   text: string;
