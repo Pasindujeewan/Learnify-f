@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { getCourses } from "../../api/getCourses";
+import { getCourses } from "../../services/courseService";
 import type { Course } from "../../types/courseType";
-import CourseCard from "../../components/CourseCard";
+import CourseCard from "../../features/courses/CourseCard";
 import { ArrowRight, BookOpenCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../../hook/toastHook";
+import { useToast } from "../../hooks/useToast";
 
 const containerVariants = {
   hidden: { opacity: 0 },

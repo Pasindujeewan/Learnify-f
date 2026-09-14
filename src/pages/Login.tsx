@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import type { LoginForm } from "../types/loginFormType";
-import { loginUser } from "../api/loginUser";
+import { loginUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../hook/toastHook";
+import { useToast } from "../hooks/useToast";
 
 export default function Login() {
   const navigate = useNavigate();
