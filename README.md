@@ -1,73 +1,134 @@
-# React + TypeScript + Vite
+# Learnify – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern and responsive Learning Management System (LMS) frontend designed to deliver a seamless learning experience for students and educators.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* **Course Management:** Browse and explore available courses.
+* **Student Dashboard:** View enrolled courses and learning progress.
+* **Authentication:** User login and registration.
+* **Course Ratings:** Rate and review courses.
+* **Search and Filtering:** Find courses using search and filtering options.
+* **Pagination:** Navigate course listings efficiently.
+* **Responsive UI:** Optimized for different screen sizes.
+* **API Integration:** Connects with backend services to manage learning data.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* Supabase
+* REST API
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* Node.js
+* pnpm
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Clone the repository:
+
+```bash
+git clone YOUR_REPOSITORY_URL
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Navigate to the project directory:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd learnify
 ```
+
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+### Environment Variables
+
+Create a `.env` file in the project root and configure the required environment variables.
+
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+Use the actual API URL and any additional variables required by your implementation.
+
+### Run the Development Server
+
+```bash
+pnpm dev
+```
+
+Open the local URL provided by Vite in your browser.
+
+### Build for Production
+
+```bash
+pnpm build
+```
+
+Preview the production build:
+
+```bash
+pnpm preview
+```
+
+## Project Structure
+
+```text
+learnify/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── pages/
+│   ├── hooks/
+│   ├── services/
+│   ├── types/
+│   ├── App.tsx
+│   └── main.tsx
+├── .env.example
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
+
+*Adjust this structure to reflect your actual project.*
+
+## Architecture
+
+The frontend communicates with backend services through REST APIs.
+
+* **UI Components:** Reusable components for consistent design.
+* **Pages:** Main application screens and routes.
+* **Services:** API communication and data handling.
+* **Types:** TypeScript definitions for improved type safety.
+* **Hooks:** Reusable React logic.
+
+## Key Highlights
+
+* Built with TypeScript for maintainable and type-safe code.
+* Uses reusable React components to improve code organization.
+* Implements pagination and filtering for better data navigation.
+* Integrates with backend APIs for dynamic data.
+* Uses Tailwind CSS for consistent and responsive styling.
+
+## Contributing
+
+Contributions and suggestions are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Commit your changes.
+4. Open a pull request.
+
+## License
+
+Add your preferred license if you intend to distribute the project publicly.
